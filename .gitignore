@@ -1,0 +1,8 @@
+# my inspiration screenshots (keep local only)
+design/inspiration/
+
+# generated stuff, never upload
+node_modules/
+dist/
+.astro/
+.env
