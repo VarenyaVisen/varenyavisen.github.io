@@ -1,4 +1,4 @@
-# Shashank's Portfolio
+# Varenya's Portfolio
 
 Personal portfolio site. The full plan lives in @docs/PLAN.md. Read it before any big change.
 Visual references are in `design/inspiration/` (what to take from each is listed in PLAN.md).
@@ -36,6 +36,7 @@ Visual references are in `design/inspiration/` (what to take from each is listed
 - After each change, run `npm run build` and `npx astro check` and fix every error before saying you're done.
 - Check both light and dark mode and a 375px mobile width for every section.
 - Never invent facts about me. Use `TODO:` placeholders in YAML for anything you don't know.
+- After finishing a section, open http://localhost:4321 in the browser, check it in light AND dark mode and at 375px mobile width, read the console for errors, and fix what you find before telling me it's done.
 
 ## Commands
 - `npm run dev` starts the dev server at http://localhost:4321
