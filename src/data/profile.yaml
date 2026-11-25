@@ -4,6 +4,9 @@ headline: SDE-II · Backend Engineer
 eyebrow: "SDE-II · ZOMATO · GO / PHP"
 tagline: "TODO: one punchy italic line"
 intro: "TODO: one-sentence intro"
+# Hero buttons: the first scrolls to Experience, the second to Contact.
+workButton: "See my work ↓"
+contactButton: "Get in touch →"
 location: India
 email: TODO
 resume: /resume.pdf

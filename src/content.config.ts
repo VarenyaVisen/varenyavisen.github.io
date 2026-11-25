@@ -73,6 +73,8 @@ const profile = z.strictObject({
   eyebrow: text,
   tagline: text,
   intro: text,
+  workButton: text,
+  contactButton: text,
   location: text,
   email: text,
   resume: text,

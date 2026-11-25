@@ -1,0 +1,270 @@
+---
+// Hero: eyebrow, name, italic tagline, intro, two buttons, and the animated ASCII "diffusion" canvas
+// that denoises code characters into each shape. Reads profile.yaml (text) and hero-shapes.yaml (shapes).
+// Animation tuning knobs (speed, hold time, density, glow) are the constants at the top of the <script>.
+import { getCollection, getEntry } from 'astro:content';
+import Button from '../ui/Button.astro';
+
+interface Props {
+  sections: string[]; // visible section ids, so buttons never point at a hidden section
+}
+const { sections } = Astro.props;
+
+const profile = (await getEntry('profile', 'profile'))!.data;
+const shapes = (await getCollection('heroShapes')).map((s) => s.data);
+
+// The canvas grid fits the biggest shape plus a margin, so every shape is drawn 1:1 ("#" = one char).
+const cols = Math.max(0, ...shapes.map((s) => s.rows[0].length)) + 8;
+const rows = Math.max(0, ...shapes.map((s) => s.rows.length)) + 6;
+// A JetBrains Mono char is 0.6em wide and we draw rows 1.2em tall, so this is the canvas aspect ratio.
+const aspect = `${cols * 0.6} / ${rows * 1.2}`;
+
+const workHref = ['experience', 'projects'].find((id) => sections.includes(id));
+const showContact = sections.includes('contact');
+
+// Decorative code the noise and shapes are made of (also the faint background field). Not personal content.
+const code = `func (s *Server) Handle(ctx context.Context, req *Request) (*Response, error) { if err := s.limiter.Wait(ctx); err != nil { return nil, err } order, err := s.store.Get(ctx, req.OrderID); if err != nil { return nil, fmt.Errorf("get order: %w", err) } for _, rule := range s.rules { if rule.Match(order) { s.queue.Publish(ctx, rule.Action(order)) } } return &Response{Status: http.StatusOK}, nil } type Node struct { next atomic.Pointer[Node]; val int64 } func (q *Queue) Push(v int64) { n := &Node{val: v}; for { tail := q.tail.Load(); if tail.next.CompareAndSwap(nil, n) { q.tail.CompareAndSwap(tail, n); return } } } SELECT id, status FROM orders WHERE updated_at > NOW() - INTERVAL 5 MINUTE; `;
+const backgroundCode = code.repeat(12);
+---
+
+<section id="home" class="hero relative scroll-mt-24 overflow-hidden">
+  <div class="code-field" aria-hidden="true">{backgroundCode}</div>
+
+  <div class="relative mx-auto grid min-h-[100svh] max-w-6xl items-center gap-10 px-4 pt-28 pb-16 sm:px-8 md:grid-cols-[1.1fr_1fr] md:gap-8">
+    <div class="min-w-0">
+      <p class="eyebrow mb-6">{profile.eyebrow}</p>
+      <h1 class="text-5xl break-words sm:text-7xl">{profile.name}</h1>
+      <p class="tagline mt-3 font-mono text-2xl break-words text-muted italic sm:text-4xl">{profile.tagline}</p>
+      <p class="mt-8 max-w-xl text-lg">{profile.intro}</p>
+      <div class="mt-10 flex flex-wrap items-center gap-x-6 gap-y-4">
+        {workHref && <Button href={`#${workHref}`}>{profile.workButton}</Button>}
+        {showContact && <Button href="#contact" variant="link">{profile.contactButton}</Button>}
+      </div>
+    </div>
+
+    {shapes.length > 0 && <canvas
+      class="ascii mx-auto w-full max-w-[22rem] md:max-w-none"
+      style={{ aspectRatio: aspect }}
+      aria-hidden="true"
+      data-hero-canvas
+      data-cols={cols}
+      data-rows={rows}
+      data-code={code}
+      data-shapes={JSON.stringify(shapes.map((s) => s.rows))}></canvas>}
+  </div>
+</section>
+
+<script>
+  // ---- Tweak me -------------------------------------------------------------------------------
+  const FPS = 30; // frame cap
+  const FORM_MS = 2600; // noise → shape
+  const HOLD_MS = 3000; // finished shape stays this long
+  const DISSOLVE_MS = 1400; // shape → noise
+  const GAP_MS = 500; // pure noise before the next shape
+  const FLICKER = 0.08; // share of noise characters that change each frame (0–1)
+  const NOISE_ALPHA = [0.1, 0.4]; // dim range of noise characters
+  const SETTLED_ALPHA = 0.35; // noise outside the shape fades to this × its level once formed
+  const ACCENT_RATE = 0.12; // share of shape characters drawn green or purple
+  const GLOW_PX = 8; // dark-mode glow around shape characters (0 = off)
+  // ---------------------------------------------------------------------------------------------
+
+  const canvas = document.querySelector<HTMLCanvasElement>('[data-hero-canvas]');
+  if (canvas) run(canvas);
+
+  function run(canvas: HTMLCanvasElement) {
+    const ctx = canvas.getContext('2d')!;
+    const cols = Number(canvas.dataset.cols);
+    const rows = Number(canvas.dataset.rows);
+    const code = canvas.dataset.code!.replaceAll(' ', '·'); // spaces would leave holes in the shape
+    const n = cols * rows;
+    const CYCLE_MS = FORM_MS + HOLD_MS + DISSOLVE_MS + GAP_MS;
+
+    // Each shape becomes a 0/1 mask the size of the grid, centered.
+    const masks = (JSON.parse(canvas.dataset.shapes!) as string[][]).map((shape) => {
+      const mask = new Uint8Array(n);
+      const top = Math.floor((rows - shape.length) / 2);
+      const left = Math.floor((cols - shape[0].length) / 2);
+      shape.forEach((line, r) => {
+        for (let c = 0; c < line.length; c++) if (line[c] === '#') mask[(top + r) * cols + left + c] = 1;
+      });
+      return mask;
+    });
+
+    // Per-cell state: when it resolves (0–1), its noise char + brightness, and its accent (0 none, 1 green, 2 purple).
+    const threshold = new Float32Array(n);
+    const noiseChar = new Uint16Array(n);
+    const noiseAlpha = new Float32Array(n);
+    const accent = new Uint8Array(n);
+    const reroll = (i: number) => {
+      noiseChar[i] = Math.floor(Math.random() * code.length);
+      noiseAlpha[i] = NOISE_ALPHA[0] + Math.random() * (NOISE_ALPHA[1] - NOISE_ALPHA[0]);
+    };
+    const newCycle = () => {
+      for (let i = 0; i < n; i++) {
+        threshold[i] = Math.random() * 0.9;
+        const a = Math.random();
+        accent[i] = a < ACCENT_RATE / 2 ? 1 : a < ACCENT_RATE ? 2 : 0;
+      }
+    };
+    for (let i = 0; i < n; i++) reroll(i);
+    newCycle();
+
+    let shapeIndex = 0;
+    let t = 0; // ms into the current shape's cycle
+
+    // 0 = pure noise, 1 = finished shape.
+    const ease = (x: number) => x * x * (3 - 2 * x);
+    const progress = () => {
+      if (t < FORM_MS) return ease(t / FORM_MS);
+      if (t < FORM_MS + HOLD_MS) return 1;
+      if (t < FORM_MS + HOLD_MS + DISSOLVE_MS) return 1 - ease((t - FORM_MS - HOLD_MS) / DISSOLVE_MS);
+      return 0;
+    };
+
+    // Colors and font come from tokens, re-read when the theme changes.
+    let colors = { ink: '', accent: '', accent2: '', dark: false, font: '' };
+    const readTheme = () => {
+      const s = getComputedStyle(canvas);
+      colors = {
+        ink: s.getPropertyValue('--ink').trim(),
+        accent: s.getPropertyValue('--accent').trim(),
+        accent2: s.getPropertyValue('--accent-2').trim(),
+        dark: s.getPropertyValue('--is-dark').trim() === '1',
+        font: s.getPropertyValue('--font-mono').trim(),
+      };
+    };
+
+    let cellW = 0;
+    let cellH = 0;
+    let fontSize = 0;
+    const resize = () => {
+      const dpr = window.devicePixelRatio || 1;
+      const w = canvas.clientWidth;
+      const h = canvas.clientHeight;
+      canvas.width = Math.round(w * dpr);
+      canvas.height = Math.round(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      cellW = w / cols;
+      cellH = h / rows;
+      fontSize = cellW / 0.6;
+    };
+
+    const draw = (p: number) => {
+      const mask = masks[shapeIndex];
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.shadowBlur = 0;
+
+      // Pass 1: noise (dims outside the shape as it forms; brightens inside just before resolving).
+      ctx.font = `400 ${fontSize}px ${colors.font}`;
+      ctx.fillStyle = colors.ink;
+      for (let i = 0; i < n; i++) {
+        const near = mask[i] ? Math.min(1, Math.max(0, (p - threshold[i]) / 0.12 + 1)) : 0;
+        if (near >= 1) continue; // resolved: drawn in pass 2
+        const calm = mask[i] ? 1 : 1 - (1 - SETTLED_ALPHA) * p;
+        ctx.globalAlpha = noiseAlpha[i] * calm + near * (1 - noiseAlpha[i]) * 0.6;
+        ctx.fillText(code[noiseChar[i]], ((i % cols) + 0.5) * cellW, (Math.floor(i / cols) + 0.5) * cellH);
+      }
+
+      // Pass 2: resolved shape characters read as real code, a few in accent colors.
+      ctx.font = `700 ${fontSize}px ${colors.font}`;
+      ctx.globalAlpha = 1;
+      if (colors.dark) ctx.shadowBlur = GLOW_PX;
+      for (let i = 0; i < n; i++) {
+        if (!mask[i] || p < threshold[i]) continue;
+        const color = accent[i] === 1 ? colors.accent : accent[i] === 2 ? colors.accent2 : colors.ink;
+        ctx.fillStyle = color;
+        ctx.shadowColor = colors.dark ? color : 'transparent';
+        ctx.fillText(code[i % code.length], ((i % cols) + 0.5) * cellW, (Math.floor(i / cols) + 0.5) * cellH);
+      }
+    };
+
+    const step = (dt: number) => {
+      t += dt;
+      if (t >= CYCLE_MS) {
+        t -= CYCLE_MS;
+        shapeIndex = (shapeIndex + 1) % masks.length;
+        newCycle();
+      }
+      const flicker = FLICKER * (1 - 0.7 * progress());
+      for (let i = 0; i < n; i++) if (Math.random() < flicker) reroll(i);
+    };
+
+    // ---- When to animate: on screen, tab visible, motion allowed. Otherwise a static first shape.
+    const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+    const isStatic = () => document.documentElement.dataset.motion === 'paused' || reducedMotion.matches;
+    let onScreen = true;
+    let raf = 0;
+    let last = 0;
+
+    const frame = (now: number) => {
+      raf = requestAnimationFrame(frame);
+      if (now - last < 1000 / FPS - 2) return;
+      step(Math.min(now - last, 100)); // clamp so a stalled tab doesn't skip a whole phase
+      last = now;
+      draw(progress());
+    };
+
+    const drawStatic = () => {
+      shapeIndex = 0;
+      t = FORM_MS; // start of the hold, so resuming continues smoothly from the finished shape
+      draw(1);
+    };
+
+    const update = () => {
+      const shouldRun = onScreen && !document.hidden && !isStatic();
+      if (shouldRun && !raf) {
+        last = performance.now();
+        raf = requestAnimationFrame(frame);
+      } else if (!shouldRun && raf) {
+        cancelAnimationFrame(raf);
+        raf = 0;
+      }
+      if (isStatic()) drawStatic();
+    };
+    const redraw = () => (raf ? undefined : isStatic() ? drawStatic() : draw(progress()));
+
+    readTheme();
+    resize();
+    redraw();
+    update();
+
+    new IntersectionObserver(([entry]) => {
+      onScreen = entry.isIntersecting;
+      update();
+    }).observe(canvas);
+    document.addEventListener('visibilitychange', update);
+    window.addEventListener('motionchange', update);
+    reducedMotion.addEventListener('change', update);
+    new ResizeObserver(() => {
+      resize();
+      redraw();
+    }).observe(canvas);
+    new MutationObserver(() => {
+      readTheme();
+      redraw();
+    }).observe(document.documentElement, { attributes: true, attributeFilter: ['data-theme'] });
+    // The mono webfont may arrive after the first frame; redraw so the static shape uses it.
+    document.fonts.ready.then(redraw);
+  }
+</script>
+
+<style>
+  /* Faint field of code behind the whole hero, fading out toward the bottom. */
+  .code-field {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    padding: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    line-height: 1.7;
+    word-break: break-all;
+    color: var(--ink);
+    opacity: calc(0.045 + var(--is-dark) * 0.03);
+    user-select: none;
+    pointer-events: none;
+    mask-image: linear-gradient(to bottom, black 40%, transparent);
+  }
+</style>
