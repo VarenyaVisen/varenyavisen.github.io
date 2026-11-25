@@ -1,0 +1,70 @@
+---
+// Fixed bottom-right "Pause motion" pill. Sets data-motion="paused" on <html>, which global.css
+// uses to stop all CSS animation, saves it, and fires a "motionchange" event for JS animations.
+// Reads no YAML.
+import { Pause, Play } from '@lucide/astro';
+---
+
+<button type="button" class="motion-toggle" data-motion-toggle>
+  <span class="when-running"><Pause size={14} aria-hidden="true" /> Pause motion</span>
+  <span class="when-paused"><Play size={14} aria-hidden="true" /> Resume motion</span>
+</button>
+
+<script>
+  const button = document.querySelector<HTMLButtonElement>('[data-motion-toggle]');
+  const root = document.documentElement;
+  const sync = () => button?.setAttribute('aria-pressed', String(root.dataset.motion === 'paused'));
+  sync();
+
+  button?.addEventListener('click', () => {
+    const paused = root.dataset.motion !== 'paused';
+    if (paused) root.dataset.motion = 'paused';
+    else delete root.dataset.motion;
+    try {
+      if (paused) localStorage.setItem('motion', 'paused');
+      else localStorage.removeItem('motion');
+    } catch {
+      // storage blocked: still works for this visit
+    }
+    sync();
+    window.dispatchEvent(new CustomEvent('motionchange', { detail: { paused } }));
+  });
+</script>
+
+<style>
+  .motion-toggle {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    z-index: 50;
+    padding: 0.5rem 0.9rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    background: color-mix(in srgb, var(--surface) 85%, transparent);
+    backdrop-filter: blur(8px);
+    color: var(--ink);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    cursor: pointer;
+    box-shadow: var(--shadow-pop);
+  }
+  .motion-toggle:hover {
+    color: var(--accent);
+  }
+  .motion-toggle span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* Label follows the <html> attribute, so it's correct before any JS runs. */
+  .when-paused {
+    display: none !important;
+  }
+  :global([data-motion="paused"]) .when-paused {
+    display: inline-flex !important;
+  }
+  :global([data-motion="paused"]) .when-running {
+    display: none !important;
+  }
+</style>

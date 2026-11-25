@@ -1,0 +1,106 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+@import "@fontsource-variable/jetbrains-mono";
+@import "@fontsource-variable/jetbrains-mono/wght-italic.css";
+@import "@fontsource-variable/geist";
+@import "@fontsource-variable/caveat";
+@import "@fontsource/instrument-serif/400.css";
+@import "@fontsource/instrument-serif/400-italic.css";
+
+/* `dark:` follows our data-theme attribute instead of the OS. Rarely needed: colors are variables.
+   Only use it for page-level things; it can't tell a light panel nested inside a dark page. */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+/* Map color tokens to Tailwind utilities: bg-bg, text-ink, border-line, text-accent…
+   Shadows switch per theme, so use them as shadow-(--shadow-pop). */
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-grid: var(--grid);
+  --color-accent: var(--accent);
+  --color-accent-2: var(--accent-2);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-2-soft: var(--accent-2-soft);
+  --color-block-orange: var(--block-orange);
+  --color-block-blue: var(--block-blue);
+  --color-block-purple: var(--block-purple);
+  --color-on-accent: var(--on-accent);
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Any element with data-theme gets the page material (so styleguide panels look right too). */
+  body,
+  [data-theme] {
+    background-color: var(--bg);
+    color: var(--ink);
+    /* faint graph paper */
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: var(--grid-size) var(--grid-size);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: 1.0625rem; /* 17px */
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  h1, h2, h3, h4 {
+    font-family: var(--font-mono);
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 3px;
+  }
+
+  ::selection {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+}
+
+@layer utilities {
+  /* Spaced-caps label, e.g. "02 · EXPERIENCE" */
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+}
+
+/* Motion kill-switch: the "Pause motion" toggle and the OS setting both stop all CSS motion.
+   JS animations (hero canvas) must also check data-motion + prefers-reduced-motion and listen for "motionchange". */
+[data-motion="paused"] *,
+[data-motion="paused"] *::before,
+[data-motion="paused"] *::after {
+  animation: none !important;
+  transition: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+  html {
+    scroll-behavior: auto;
+  }
+}

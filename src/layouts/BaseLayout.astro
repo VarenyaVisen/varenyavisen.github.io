@@ -1,0 +1,50 @@
+---
+// Page shell: <head>, fonts/styles, the no-flash theme script and the Pause motion pill.
+// Reads no YAML yet (Phase 3 adds the nav, footer and site.yaml SEO data).
+import '../styles/global.css';
+import MotionToggle from '../components/ui/MotionToggle.astro';
+
+interface Props {
+  title: string;
+  description?: string;
+  noindex?: boolean;
+}
+
+const { title, description, noindex = false } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    {description && <meta name="description" content={description} />}
+    {noindex && <meta name="robots" content="noindex" />}
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+
+    <!-- Runs before first paint so the page never flashes the wrong theme.
+         Theme: saved choice, else the OS preference. Motion: saved "paused" choice. -->
+    <script is:inline>
+      (function () {
+        var root = document.documentElement;
+        var theme = null;
+        var motion = null;
+        try {
+          theme = localStorage.getItem('theme');
+          motion = localStorage.getItem('motion');
+        } catch (e) {}
+        if (theme !== 'light' && theme !== 'dark') {
+          theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        }
+        root.dataset.theme = theme;
+        if (motion === 'paused') root.dataset.motion = 'paused';
+      })();
+    </script>
+  </head>
+  <body>
+    <slot />
+    <MotionToggle />
+  </body>
+</html>

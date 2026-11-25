@@ -1,0 +1,84 @@
+/*
+  Design tokens: the ONLY place colors, radii, shadows and fonts are defined.
+  Light = "Notebook" (cream graph paper), Dark = "Night terminal".
+  Dark values sit on [data-theme="dark"] (any element), so a single <div data-theme="dark">
+  can render dark inside a light page. /styleguide uses this to show both themes side by side.
+*/
+
+:root,
+[data-theme="light"] {
+  --bg: #F5F0E6;
+  --surface: #FFFDF8;
+  --ink: #1C1A17;
+  --muted: #6B645A;
+  --line: #1C1A17;
+  --grid: rgba(28, 26, 23, 0.07);
+  --accent: #15803D;
+  --accent-2: #7C3AED; /* darker than #8B5CF6 so text passes WCAG AA on cream */
+  --accent-soft: rgba(21, 128, 61, 0.12);
+  --accent-2-soft: rgba(124, 58, 237, 0.10);
+  --block-orange: #F6B67A;
+  --block-blue: #A5C8F5;
+  --block-purple: #CFC2F7;
+  --on-accent: #FFFDF8;
+
+  --shadow-pop: 3px 3px 0 var(--ink);
+  --shadow-pressed: 1px 1px 0 var(--ink);
+  --press-offset: 2px;
+
+  /* Material differences live here as tokens (not as [data-theme] selectors in components),
+     because a variable always comes from the NEAREST themed ancestor. */
+  --border-w: 2px;                /* chunky ink outlines */
+  --glow-border: var(--line);     /* border of buttons that glow in dark mode */
+  --tag-border: var(--muted);
+  --is-light: 100%;               /* color-mix switch: 100% picks the light value, 0% the dark one */
+
+  color-scheme: light;
+}
+
+[data-theme="dark"] {
+  --bg: #0A0A0B;
+  --surface: #111113;
+  --ink: #EDEAE4;
+  --muted: #8A8680;
+  --line: #2A2A2E;
+  --grid: rgba(255, 255, 255, 0.04);
+  --accent: #22C55E;
+  --accent-2: #A78BFA;
+  --accent-soft: rgba(34, 197, 94, 0.12);
+  --accent-2-soft: rgba(167, 139, 250, 0.12);
+  --block-orange: #FBBF24;
+  --block-blue: #60A5FA;
+  --block-purple: #A78BFA;
+  --on-accent: #0A0A0B;
+
+  --shadow-pop: 0 0 0 1px var(--line), 0 0 24px -8px var(--accent);
+  --shadow-pressed: 0 0 0 1px var(--accent), 0 0 12px -6px var(--accent);
+  --press-offset: 0px; /* glows don't "press" down, they just tighten */
+
+  --border-w: 1px;
+  --glow-border: color-mix(in srgb, var(--accent) 45%, var(--line));
+  --tag-border: var(--line);
+  --is-light: 0%;
+
+  color-scheme: dark;
+}
+
+/* Theme-independent tokens. @theme makes Tailwind create utilities from them too:
+   font-mono, font-sans, font-hand, font-serif, rounded-sm … rounded-xl.
+   "static" = always output these variables, even if no utility uses them yet. */
+@theme static {
+  --font-mono: 'JetBrains Mono Variable', ui-monospace, monospace;
+  --font-sans: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-hand: 'Caveat Variable', cursive;
+  --font-serif: 'Instrument Serif', Georgia, serif;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 20px;
+  --radius-xl: 32px;
+}
+
+:root {
+  --grid-size: 24px;
+}

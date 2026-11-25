@@ -10,7 +10,7 @@ It's fun to look at but still professional enough to send to a recruiter.
 
 | File | Take this | Leave this |
 |---|---|---|
-| `01-hero-ascii-portrait.png` | Big bold **monospace** headline with an *italic muted* second line. Spaced-caps eyebrow label ("PONYTAIL 5.3 · NOW WITH…"). An **ASCII portrait made of code characters** with a few accent-colored glyphs. Faint code texture in the background. Floating pill nav with blur. "Pause motion" button. | The exact wording and branding |
+| `01-hero-ascii-portrait.png` | Big bold **monospace** headline with an *italic muted* second line. Spaced-caps eyebrow label ("PONYTAIL 5.3 · NOW WITH…"). **ASCII art made of code characters** with a few accent-colored glyphs (we use it for an animated "diffusion" canvas). Faint code texture in the background. Floating pill nav with blur. "Pause motion" button. | The exact wording and branding |
 | `02-hero-ascii-portrait-variant.png` | Same hero, different portrait framing. The portrait can be loose or partial; it doesn't need a full face. | — |
 | `03-experience-pipeline-diagram.png` | Experience entry layout: role title, company in accent color, location, `FULL-TIME` tag. A **"the product, end-to-end" pipeline diagram** (nodes in a line, small label above, metric below). `CAME IN TO DO` paragraph. `SHIPPED` list with `→` bullets, dashed dividers and `case study →` links. Subtle grid background. | Their content |
 | `04-experience-latency-trace.png` | **Latency trace / waterfall** variant of the diagram (query → expand → retrieve → answer, with timing bars). The date range sits top-right. | — |
@@ -82,7 +82,7 @@ Portfolio/
 │   │   ├── achievements.yaml
 │   │   ├── certifications.yaml
 │   │   └── interests.yaml
-│   ├── assets/                ← images (photo for ASCII portrait, interest photos, logos)
+│   ├── assets/                ← images (interest photos, logos)
 │   ├── content.config.ts      ← zod schemas for every YAML file
 │   ├── styles/
 │   │   ├── tokens.css         ← colors, fonts, radii, shadows for light + dark
@@ -117,7 +117,7 @@ Portfolio/
 | `--line` (borders) | `#1C1A17` | `#2A2A2E` |
 | `--grid` | `rgba(28,26,23,0.07)` | `rgba(255,255,255,0.04)` |
 | `--accent` (green) | `#15803D` | `#22C55E` |
-| `--accent-2` (purple) | `#8B5CF6` | `#A78BFA` |
+| `--accent-2` (purple) | `#7C3AED` (darker than #8B5CF6 so text passes WCAG AA) | `#A78BFA` |
 | `--block-orange` | `#F6B67A` | `#FBBF24` |
 | `--block-blue` | `#A5C8F5` | `#60A5FA` |
 | `--block-purple` | `#CFC2F7` | `#A78BFA` |
@@ -140,7 +140,7 @@ Portfolio/
 ### Motion
 - Fade/slide-in on scroll (once), 200–400ms, ease-out.
 - Diagram "packets": small dots travelling along pipeline lines.
-- ASCII portrait shimmer: random glyphs change slowly and a few light up in accent colors.
+- Hero diffusion: shapes form out of ASCII noise, hold, then dissolve (see Hero).
 - A global **Pause motion** button (bottom-right, like screenshot 01) plus `prefers-reduced-motion` turn all of this off.
 
 ---
@@ -156,12 +156,17 @@ On mobile it collapses to a menu button.
 - Eyebrow: `SDE-II · ZOMATO · GO / PHP →`
 - Title: name in big bold mono. Second line in italic muted mono (e.g. *"I build the boring parts that never go down."*). The tagline comes from YAML.
 - One-sentence intro + two buttons: `See my work ↓` (chunky) and `Get in touch →` (text link).
-- Right side: **ASCII portrait** generated at build time from `src/assets/me.jpg`, drawn with characters from my own Go/C++ snippets. A few glyphs are accent-colored and slowly shimmer. Fallback if there's no photo: an isometric doodle of a server rack with a coffee mug.
+- Right side: an animated **"diffusion" ASCII canvas** (inspired by screenshot 01). No photo.
+  - Background: dim code characters.
+  - A shape forms out of random noise, as if an AI is denoising it: characters inside the shape brighten and some turn accent-colored. It holds ~3s, dissolves back into noise, then the next shape forms.
+  - Shapes cycle: neural network, brain, server rack, game controller, trophy, my initials.
+  - Shapes live in `src/data/hero-shapes.yaml` as text masks (rows of `#` and `.`) so I can draw new ones in a text editor.
+  - Capped at ~30fps, pauses when the hero is off-screen, shows one static shape when Pause motion or `prefers-reduced-motion` is on, and uses theme tokens so it looks right in both themes.
 - Background: faint code texture (dark mode) / graph paper (light mode).
 
 ### About (`profile.yaml → about, quickFacts`)
 - Left: 2–3 short paragraphs.
-- Right: 3–4 "sticky note" quick-fact cards, slightly rotated: `🎓 IIT Dhanbad`, `📍 India`, `⚡ currently into low-latency C++`, `☕ …`
+- Right: 3–4 "sticky note" quick-fact cards, slightly rotated, each with a Lucide icon: `IIT Dhanbad`, `India`, `currently into low-latency C++`, `…`
 - One handwritten annotation pointing at something fun.
 
 ### Experience (`experience.yaml`)
@@ -199,8 +204,8 @@ Bento grid (screenshot 06). Instrument Serif headings, big rounded cards.
 ### Contact + footer (`profile.yaml → links, email`)
 A terminal-style card:
 ```
-$ contact shashank
-> email    shashank@…   [copy]
+$ contact varenya          (name comes from profile.yaml)
+> email    TODO           [copy]
 > github   github.com/…
 > linkedin linkedin.com/in/…
 ```
@@ -212,7 +217,7 @@ Footer: "Built with Astro · last updated {build date}" + a tiny doodle.
 
 `src/data/profile.yaml`
 ```yaml
-name: Shashank
+name: Varenya
 headline: SDE-II · Backend Engineer
 eyebrow: "SDE-II · ZOMATO · GO / PHP"
 tagline: "TODO: one punchy italic line"
@@ -220,7 +225,6 @@ intro: "TODO: one-sentence intro"
 location: India
 email: TODO
 resume: /resume.pdf
-photo: me.jpg            # in src/assets, used for the ASCII portrait
 about:
   - "TODO paragraph 1"
   - "TODO paragraph 2"
@@ -340,7 +344,7 @@ links:
 | 1 | **Scaffold + design system**: Astro, Tailwind, fonts, `tokens.css`, theme toggle, Pause motion, `/styleguide` | /styleguide looks right in both themes, no flash on reload |
 | 2 | **Data layer**: all YAML files + zod schemas + `TODO` placeholders | `astro check` passes; a deliberate typo gives a readable error |
 | 3 | **Layout**: BaseLayout, floating nav, footer, section shells, hide-if-empty logic | Nav scrolls to each section; mobile menu works |
-| 4 | **Hero** with ASCII portrait | Looks good in both themes; motion stops when paused |
+| 4 | **Hero** with diffusion ASCII canvas | Looks good in both themes; motion stops when paused |
 | 5 | **About + Experience** with PipelineDiagram / TraceDiagram | Diagrams are driven entirely by YAML |
 | 6 | **Projects + Skills** | — |
 | 7 | **Achievements + Certifications + Interests** | Bento works on mobile |

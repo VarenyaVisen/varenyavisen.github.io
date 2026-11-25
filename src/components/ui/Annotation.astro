@@ -1,0 +1,63 @@
+---
+// Handwritten note (Caveat) with a loopy hand-drawn arrow, like "some of my favourites ↗".
+// `arrow` says where the arrow points relative to the text. Reads no YAML.
+interface Props {
+  text: string;
+  arrow?: 'left' | 'right' | 'up' | 'down';
+  class?: string;
+}
+
+const { text, arrow = 'right', class: className } = Astro.props;
+---
+
+<span class:list={['annotation', `arrow-${arrow}`, className]}>
+  <span class="note">{text}</span>
+  <svg class="arrow" viewBox="0 0 100 50" aria-hidden="true">
+    <!-- drawn pointing right; CSS rotates/mirrors it for other directions -->
+    <path d="M4 38 C 18 44, 34 40, 40 30 C 46 20, 36 12, 31 20 C 26 28, 44 36, 60 30 C 72 26, 82 20, 92 14"></path>
+    <path d="M82 9 L93 13 L86 23"></path>
+  </svg>
+</span>
+
+<style>
+  .annotation {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--muted);
+    font-family: var(--font-hand);
+    font-size: 1.5rem;
+    line-height: 1.1;
+  }
+  .arrow {
+    width: 4.5rem;
+    height: 2.25rem;
+    flex: none;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .arrow-left {
+    flex-direction: row-reverse;
+  }
+  .arrow-left .arrow {
+    transform: scaleX(-1);
+  }
+  .arrow-up {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+  }
+  .arrow-up .arrow {
+    transform: rotate(-60deg);
+  }
+  .arrow-down {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .arrow-down .arrow {
+    transform: rotate(60deg);
+  }
+</style>

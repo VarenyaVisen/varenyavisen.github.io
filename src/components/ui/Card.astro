@@ -1,0 +1,60 @@
+---
+// Content card. "default" = surface + ink border + pop shadow (glow in dark mode).
+// "callout" = tinted "key idea" box with an optional eyebrow title (screenshot 05). Reads no YAML.
+import { Sparkles } from '@lucide/astro';
+
+interface Props {
+  variant?: 'default' | 'callout';
+  title?: string; // eyebrow shown in the callout
+  class?: string;
+}
+
+const { variant = 'default', title, class: className } = Astro.props;
+---
+
+<div class:list={['card', `card-${variant}`, className]}>
+  {
+    variant === 'callout' && (
+      <span class="callout-icon">
+        <Sparkles size={18} aria-hidden="true" />
+      </span>
+    )
+  }
+  <div class="card-body">
+    {title && <p class="eyebrow mb-1">{title}</p>}
+    <slot />
+  </div>
+</div>
+
+<style>
+  .card {
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+  }
+
+  .card-default {
+    background: var(--surface);
+    border: var(--border-w) solid var(--line);
+    box-shadow: var(--shadow-pop);
+  }
+
+  .card-callout {
+    display: flex;
+    gap: 0.9rem;
+    align-items: flex-start;
+    background: var(--accent-2-soft);
+    border: 1.5px solid color-mix(in srgb, var(--accent-2) 40%, transparent);
+    font-size: 0.95rem;
+  }
+  .callout-icon {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: var(--radius-sm);
+    border: 1.5px solid var(--line);
+    background: var(--surface);
+    color: var(--accent-2);
+  }
+</style>

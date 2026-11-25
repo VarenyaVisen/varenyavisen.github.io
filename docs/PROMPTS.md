@@ -62,11 +62,11 @@ from site.yaml. Nav links smooth-scroll to sections and hide when a section is e
 
 ```
 Do Phase 4: the Hero section as described in @docs/PLAN.md, matching the layout
-of @design/inspiration/01-hero-ascii-portrait.png. Generate the ASCII portrait at
-build time from src/assets/me.jpg using characters from code snippets, with a few
-accent-colored glyphs that shimmer slowly. It must stop when Pause motion is on
-or prefers-reduced-motion is set, and look good in both themes. If there's no
-photo yet, use the isometric fallback from the plan.
+of @design/inspiration/01-hero-ascii-portrait.png. Build the diffusion ASCII
+canvas: shapes from src/data/hero-shapes.yaml form out of code-character noise,
+hold ~3s, dissolve, and cycle. Cap at ~30fps, pause when off-screen, show one
+static shape when Pause motion or prefers-reduced-motion is on, and look good in
+both themes.
 ```
 
 ## Phase 5: About + Experience

@@ -1,0 +1,66 @@
+---
+// Shared button. "chunky" = ink border + hard offset shadow that presses down (glows in dark mode).
+// "link" = quiet mono text link, e.g. "Get in touch →". Renders <a> when href is given. Reads no YAML.
+interface Props {
+  href?: string;
+  variant?: 'chunky' | 'link';
+  type?: 'button' | 'submit';
+  class?: string;
+  [key: string]: unknown; // pass-through attributes (target, aria-*, data-*)
+}
+
+const { href, variant = 'chunky', type = 'button', class: className, ...rest } = Astro.props;
+const Tag = href ? 'a' : 'button';
+---
+
+<Tag
+  href={href}
+  type={href ? undefined : type}
+  class:list={['btn', `btn-${variant}`, className]}
+  {...rest}
+>
+  <slot />
+</Tag>
+
+<style>
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .btn-chunky {
+    padding: 0.7rem 1.25rem;
+    border: var(--border-w) solid var(--glow-border);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: var(--shadow-pop);
+    transition:
+      transform 120ms ease-out,
+      box-shadow 120ms ease-out,
+      background-color 120ms ease-out;
+  }
+  .btn-chunky:hover {
+    background: linear-gradient(var(--accent-soft), var(--accent-soft)), var(--surface);
+  }
+  .btn-chunky:active {
+    transform: translate(var(--press-offset), var(--press-offset));
+    box-shadow: var(--shadow-pressed);
+  }
+  .btn-link {
+    padding: 0.25rem 0;
+    background: none;
+    border: none;
+    color: var(--muted);
+    transition: color 150ms ease-out;
+  }
+  .btn-link:hover {
+    color: var(--accent);
+  }
+</style>

@@ -1,0 +1,162 @@
+---
+// /styleguide: every token and shared ui component, rendered in BOTH themes side by side.
+// Not linked anywhere and marked noindex. Demo text only, no personal content; reads no YAML.
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ThemeToggle from '../components/ui/ThemeToggle.astro';
+import Button from '../components/ui/Button.astro';
+import Badge from '../components/ui/Badge.astro';
+import Card from '../components/ui/Card.astro';
+import SectionHeader from '../components/ui/SectionHeader.astro';
+import Annotation from '../components/ui/Annotation.astro';
+
+const themes = ['light', 'dark'] as const;
+
+const colors = [
+  'bg', 'surface', 'ink', 'muted', 'line', 'accent', 'accent-2',
+  'block-orange', 'block-blue', 'block-purple',
+];
+
+const fonts = [
+  { name: 'JetBrains Mono', cls: 'font-mono font-bold', sample: 'Headings & labels 0123' },
+  { name: 'Geist', cls: 'font-sans', sample: 'Body text reads calmly at 17px.' },
+  { name: 'Caveat', cls: 'font-hand text-2xl', sample: 'a handwritten side note' },
+  { name: 'Instrument Serif', cls: 'font-serif text-3xl', sample: 'Interests only' },
+];
+---
+
+<BaseLayout title="Styleguide" noindex>
+  <main class="mx-auto max-w-[1400px] px-4 py-10 sm:px-8">
+    <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
+      <div>
+        <p class="eyebrow">dev · design system</p>
+        <h1 class="text-3xl sm:text-4xl">Styleguide</h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <span class="eyebrow">page theme</span>
+        <ThemeToggle />
+      </div>
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-2">
+      {
+        themes.map((theme) => (
+          <section
+            data-theme={theme}
+            class="flex min-w-0 flex-col gap-10 rounded-xl border border-line p-5 sm:p-8"
+          >
+            <p class="eyebrow">{theme} mode</p>
+
+            <div>
+              <h3 class="mb-4 text-sm">Colors</h3>
+              <div class="grid grid-cols-2 gap-3 sm:grid-cols-5">
+                {colors.map((c) => (
+                  <div class="text-xs">
+                    <div
+                      class="mb-1 h-12 rounded-md border border-line"
+                      style={`background: var(--${c})`}
+                    />
+                    <code class="font-mono text-muted">--{c}</code>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div>
+              <h3 class="mb-4 text-sm">Type</h3>
+              <ul class="flex flex-col gap-3">
+                {fonts.map((f) => (
+                  <li>
+                    <p class="eyebrow">{f.name}</p>
+                    <p class={f.cls}>{f.sample}</p>
+                  </li>
+                ))}
+              </ul>
+              <p class="mt-3 text-accent">Accent text passes on bg.</p>
+              <p class="text-accent-2">Accent-2 text passes on bg.</p>
+            </div>
+
+            <div>
+              <h3 class="mb-4 text-sm">Section header</h3>
+              <SectionHeader index={2} label="Experience" title="Where I've worked" subtitle="and what I shipped." />
+            </div>
+
+            <div>
+              <h3 class="mb-4 text-sm">Buttons</h3>
+              <div class="flex flex-wrap items-center gap-5">
+                <Button href="#">See my work ↓</Button>
+                <Button>Press me</Button>
+                <Button variant="link" href="#">Get in touch →</Button>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="mb-4 text-sm">Badges</h3>
+              <div class="flex flex-wrap items-center gap-3">
+                <Badge color="orange" tilt={-2}>Go</Badge>
+                <Badge color="blue" tilt={1.5}>PostgreSQL</Badge>
+                <Badge color="purple" tilt={-1}>Kafka</Badge>
+                <Badge color="accent" tilt={2}>low-latency</Badge>
+                <Badge color="accent-2">concurrency</Badge>
+                <Badge>plain</Badge>
+                <Badge variant="box">Full-time</Badge>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="mb-4 text-sm">Cards</h3>
+              <div class="flex flex-col gap-5">
+                <Card>
+                  <h4 class="mb-1 text-lg">Card title</h4>
+                  <p class="text-muted">Surface, ink border and a hard pop shadow. Glows in dark mode.</p>
+                </Card>
+                <Card variant="callout" title="Key idea">
+                  A tinted callout box for the one thing worth remembering.
+                </Card>
+              </div>
+            </div>
+
+            <div>
+              <h3 class="mb-4 text-sm">Annotation</h3>
+              <div class="flex flex-wrap items-center gap-6">
+                <Annotation text="some of my favourites" arrow="right" />
+                <Annotation text="look here" arrow="left" />
+                <Annotation text="up there" arrow="up" />
+              </div>
+            </div>
+
+            <div>
+              <h3 class="mb-4 text-sm">Motion (stops on Pause motion)</h3>
+              <div class="relative h-1 rounded-full bg-line">
+                <span class="packet" />
+              </div>
+            </div>
+          </section>
+        ))
+      }
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  /* Demo "packet" dot, the same idea the pipeline diagrams will use in Phase 5. */
+  .packet {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 0.6rem;
+    height: 0.6rem;
+    margin-top: -0.3rem;
+    border-radius: 999px;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+    animation: travel 2.4s ease-in-out infinite;
+  }
+  @keyframes travel {
+    from {
+      left: 0;
+    }
+    to {
+      left: calc(100% - 0.6rem);
+    }
+  }
+</style>

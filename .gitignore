@@ -5,4 +5,7 @@ design/inspiration/
 node_modules/
 dist/
 .astro/
-.env
+.env.env.production
+npm-debug.log*
+.DS_Store
+.idea/
