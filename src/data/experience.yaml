@@ -1,0 +1,29 @@
+# Jobs, newest first. To add one: copy the whole top entry, paste it above, edit.
+- company: Zomato (Eternal)
+  companyUrl: https://www.zomato.com
+  role: SDE-II, Backend
+  type: Full-time
+  location: TODO
+  start: TODO          # e.g. 2023-07
+  end: present
+  cameInToDo: >
+    TODO: what you were hired to own: customer support automation,
+    order management systems, proactive support infrastructure.
+  diagram:             # optional, delete this whole block to hide it
+    type: pipeline     # pipeline | trace
+    title: "PROACTIVE SUPPORT, END-TO-END"
+    nodes:
+      - { above: ingest, label: "order events", below: "TODO metric" }
+      - { above: detect, label: "issue rules",  below: "TODO" }
+      - { above: act,    label: "auto-resolve", below: "TODO" }
+      - { above: notify, label: "customer",     below: "TODO" }
+    # A trace diagram looks like this instead (steps run one after another):
+    # type: trace
+    # title: "TODO"
+    # steps:
+    #   - { label: query, ms: 12 }
+    #   - { label: retrieve, ms: 40 }
+  shipped:
+    - text: "TODO: thing you shipped · how · impact"
+      link: null       # or a URL to show "case study →"
+  stack: [Go, PHP, SQL]

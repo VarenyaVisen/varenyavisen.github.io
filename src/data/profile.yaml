@@ -1,0 +1,29 @@
+# Who you are. Used by the Hero, About and Contact sections.
+name: Varenya
+headline: SDE-II · Backend Engineer
+eyebrow: "SDE-II · ZOMATO · GO / PHP"
+tagline: "TODO: one punchy italic line"
+intro: "TODO: one-sentence intro"
+location: India
+email: TODO
+resume: /resume.pdf
+
+# About section paragraphs. Empty list ([]) hides the About section.
+about:
+  - "TODO: paragraph 1"
+  - "TODO: paragraph 2"
+
+# Sticky-note cards next to About. icon = a Lucide icon name (lucide.dev/icons).
+quickFacts:
+  - { icon: graduation-cap, text: "IIT Dhanbad" }
+  - { icon: map-pin, text: "India" }
+  - { icon: zap, text: "Currently into low-latency C++" }
+
+# Social links. icon = a Simple Icons slug (simpleicons.org), optional.
+# LinkedIn has no icon: Simple Icons removed its logo, so it shows as a text label.
+links:
+  - { label: GitHub, url: TODO, icon: github }
+  - { label: LinkedIn, url: TODO }
+  - { label: Codeforces, url: TODO, icon: codeforces }
+  # - { label: LeetCode, url: TODO, icon: leetcode }
+  # - { label: X, url: TODO, icon: x }

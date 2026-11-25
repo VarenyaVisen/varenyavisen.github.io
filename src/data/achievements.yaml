@@ -1,0 +1,19 @@
+# "Achievement unlocked" cards. rarity: gold | silver | bronze. icon = a Lucide icon name.
+- title: Candidate Master
+  subtitle: Codeforces
+  rarity: gold
+  icon: trophy
+  date: TODO
+  link: TODO
+
+- title: ICPC Regionalist
+  subtitle: ICPC
+  rarity: silver
+  icon: medal
+  date: TODO
+
+- title: Meta Hacker Cup, Round 2
+  subtitle: Meta
+  rarity: silver
+  icon: flag
+  date: TODO

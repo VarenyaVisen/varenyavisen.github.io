@@ -1,0 +1,9 @@
+# Skill groups, shown as chips. Each group needs at least one item.
+- category: Languages
+  items: [Go, PHP, C++, Python, TypeScript, SQL]
+
+- category: Backend & Infra
+  items: [TODO]
+
+- category: Frontend
+  items: [React]

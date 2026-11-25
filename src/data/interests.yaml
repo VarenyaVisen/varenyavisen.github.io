@@ -1,0 +1,14 @@
+# Bento cards. layout: wide | tall | square. kind: stack (tilted tiles) | carousel | plain.
+# images are paths inside src/assets/, e.g. gaming/1.jpg
+- title: I love gaming
+  text: "TODO: what you play / how"
+  layout: wide
+  kind: stack
+  note: "some of my favourites"
+  images: []           # TODO: add your own screenshots
+
+# More cards, e.g.:
+# - title: "TODO"
+#   layout: tall
+#   kind: carousel
+#   images: [photos/1.jpg, photos/2.jpg]

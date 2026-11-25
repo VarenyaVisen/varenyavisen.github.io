@@ -1,0 +1,19 @@
+# Project cards. featured: true makes a wide card. repo/demo are optional links.
+- title: O(1) Order Book
+  oneLiner: "Limit order book with O(1) add / cancel / match"
+  highlight: "O(1) per op"
+  tags: [C++, low-latency]
+  repo: TODO
+  featured: true
+
+- title: Lock-free Seqlock
+  oneLiner: "TODO"
+  highlight: "lock-free"
+  tags: [C++, concurrency]
+  repo: TODO
+
+- title: Wait-free SPSC Queue
+  oneLiner: "TODO"
+  highlight: "wait-free"
+  tags: [C++, concurrency]
+  repo: TODO
