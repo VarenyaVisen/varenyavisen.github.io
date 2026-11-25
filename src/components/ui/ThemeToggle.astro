@@ -1,84 +1,72 @@
 ---
-// Sun/moon button that flips data-theme on <html> and saves the choice in localStorage.
-// Which icon shows is pure CSS (based on data-theme), so it's right on first paint. Reads no YAML.
+// Theme toggle: day/night pill switch. A knob slides over the current mode's icon:
+// an orange sun-knob on the left in light, a purple moon-knob with tiny stars on the right in dark.
+// Clicking flips the theme (handler in BaseLayout). Reads no YAML.
 ---
 
-<button type="button" class="theme-toggle" data-theme-toggle aria-label="Toggle dark mode">
-  <!-- sun -->
-  <svg class="icon sun" viewBox="0 0 24 24" aria-hidden="true">
-    <circle cx="12" cy="12" r="4.5"></circle>
-    <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8"></path>
+<button type="button" class="tt-switch" data-theme-toggle aria-label="Toggle dark mode">
+  <svg class="track-icon sun" viewBox="0 0 24 24" aria-hidden="true">
+    <circle cx="12" cy="12" r="4" />
+    <path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" />
   </svg>
-  <!-- moon wearing a tiny nightcap -->
-  <svg class="icon moon" viewBox="0 0 24 24" aria-hidden="true">
-    <path d="M19 14.5A7.5 7.5 0 1 1 10.2 5.3a6 6 0 0 0 8.8 9.2Z"></path>
-    <path class="cap" d="M9.6 5.6 C 10.5 2.6, 14.2 1.4, 16.8 3.2 L 13.6 4.4 Z"></path>
-    <circle class="pom" cx="17.4" cy="3" r="1.2"></circle>
+  <svg class="track-icon moon" viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
   </svg>
+  <span class="knob">
+    <svg class="knob-stars" viewBox="0 0 24 24" aria-hidden="true">
+      <circle cx="8" cy="8" r="1.6" />
+      <circle cx="15.5" cy="12" r="1.1" />
+      <circle cx="9.5" cy="16" r="0.9" />
+    </svg>
+  </span>
 </button>
 
-<script>
-  // Every toggle on the page shares this handler.
-  for (const button of document.querySelectorAll<HTMLButtonElement>('[data-theme-toggle]')) {
-    button.addEventListener('click', () => {
-      const root = document.documentElement;
-      const next = root.dataset.theme === 'dark' ? 'light' : 'dark';
-      root.dataset.theme = next;
-      try {
-        localStorage.setItem('theme', next);
-      } catch {
-        // storage blocked (private mode): the toggle still works for this visit
-      }
-    });
-  }
-</script>
-
 <style>
-  .theme-toggle {
+  .tt-switch {
     position: relative;
-    display: inline-grid;
-    place-items: center;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: 4.25rem;
+    height: 2.25rem;
     border-radius: 999px;
-    border: 1.5px solid var(--line);
+    border: var(--border-w) solid var(--glow-border);
     background: var(--surface);
-    color: var(--ink);
+    box-shadow: var(--shadow-pop);
     cursor: pointer;
   }
-  .theme-toggle:hover {
-    color: var(--accent);
-  }
 
-  .icon {
-    grid-area: 1 / 1;
-    width: 1.25rem;
-    height: 1.25rem;
+  .track-icon {
+    position: absolute;
+    top: 50%;
+    width: 1rem;
+    height: 1rem;
+    margin-top: -0.5rem;
     fill: none;
-    stroke: currentColor;
-    stroke-width: 1.8;
+    stroke: var(--muted);
+    stroke-width: 2;
     stroke-linecap: round;
     stroke-linejoin: round;
-    transition: transform 400ms ease-out, opacity 250ms ease-out;
   }
-  .moon .cap,
-  .moon .pom {
-    fill: var(--accent-2);
-    stroke: var(--accent-2);
-    stroke-width: 1;
-  }
+  .sun { left: 0.55rem; }
+  .moon { right: 0.55rem; }
 
-  /* Light: sun visible, moon rotated away. Dark: the reverse. */
-  .moon {
-    opacity: 0;
-    transform: rotate(-90deg) scale(0.6);
+  /* --is-dark is 0 in light, 1 in dark (tokens.css): it slides the knob and swaps its color. */
+  .knob {
+    position: absolute;
+    top: 50%;
+    left: calc(0.2rem + var(--is-dark) * (100% - 2rem));
+    width: 1.6rem;
+    height: 1.6rem;
+    margin-top: -0.8rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    background: color-mix(in srgb, var(--block-orange) var(--is-light), var(--block-purple));
+    box-shadow: 0 0 calc(var(--is-dark) * 12px) var(--accent-2);
+    transition: left 300ms ease-out, background-color 300ms ease-out;
   }
-  :global([data-theme="dark"]) .sun {
-    opacity: 0;
-    transform: rotate(90deg) scale(0.6);
-  }
-  :global([data-theme="dark"]) .moon {
-    opacity: 1;
-    transform: none;
+  .knob-stars {
+    width: 100%;
+    height: 100%;
+    fill: var(--ink);
+    opacity: var(--is-dark);
+    transition: opacity 300ms ease-out;
   }
 </style>

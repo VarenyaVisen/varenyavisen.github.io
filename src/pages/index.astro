@@ -1,10 +1,33 @@
 ---
-// Home page. Placeholder until Phase 3 adds the nav and the section shells from site.yaml.
+// Home page: one section per entry in site.yaml's `sections` list, in that order.
+// Empty sections are already dropped by visibleSections(). Each shell gets replaced by its
+// real component in src/components/sections/ in Phases 4–7.
+import { getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
+import SectionHeader from '../components/ui/SectionHeader.astro';
+import { sectionLabels, visibleSections } from '../lib/sections';
+
+const profile = await getEntry('profile', 'profile');
+const sections = await visibleSections();
+const numbered = sections.filter((id) => id !== 'home'); // the hero gets no "01 ·" number
 ---
 
-<BaseLayout title="Portfolio">
-  <main class="mx-auto max-w-3xl px-4 py-24">
-    <p class="eyebrow">under construction</p>
+<BaseLayout>
+  <main>
+    {sections.map((id) => (
+      <section id={id} class="mx-auto min-h-[70vh] max-w-6xl scroll-mt-24 px-4 py-24 sm:px-8">
+        {id === 'home' ? (
+          <div class="pt-16">
+            <p class="eyebrow mb-4">{profile?.data.eyebrow}</p>
+            <h1 class="text-5xl sm:text-7xl">{profile?.data.name}</h1>
+          </div>
+        ) : (
+          <SectionHeader index={numbered.indexOf(id) + 1} label={sectionLabels[id]} title={sectionLabels[id]} />
+        )}
+        <p class="mt-8 rounded-md border border-dashed border-line p-6 font-mono text-sm text-muted">
+          {sectionLabels[id]} section · coming in a later phase
+        </p>
+      </section>
+    ))}
   </main>
 </BaseLayout>

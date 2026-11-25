@@ -32,6 +32,7 @@
   --glow-border: var(--line);     /* border of buttons that glow in dark mode */
   --tag-border: var(--muted);
   --is-light: 100%;               /* color-mix switch: 100% picks the light value, 0% the dark one */
+  --is-dark: 0;                   /* calc switch for numbers: calc(var(--is-dark) * 90deg) is 0 in light */
 
   color-scheme: light;
 }
@@ -60,6 +61,7 @@
   --glow-border: color-mix(in srgb, var(--accent) 45%, var(--line));
   --tag-border: var(--line);
   --is-light: 0%;
+  --is-dark: 1;
 
   color-scheme: dark;
 }

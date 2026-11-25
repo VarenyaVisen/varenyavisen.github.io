@@ -1,6 +1,8 @@
 ---
 // /styleguide: every token and shared ui component, rendered in BOTH themes side by side.
-// Not linked anywhere and marked noindex. Demo text only, no personal content; reads no YAML.
+// Not linked anywhere and marked noindex. Demo text only; reads profile.yaml just for the name
+// in the nav-logo previews.
+import { getEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ThemeToggle from '../components/ui/ThemeToggle.astro';
 import Button from '../components/ui/Button.astro';
@@ -8,6 +10,9 @@ import Badge from '../components/ui/Badge.astro';
 import Card from '../components/ui/Card.astro';
 import SectionHeader from '../components/ui/SectionHeader.astro';
 import Annotation from '../components/ui/Annotation.astro';
+import NameMark from '../components/ui/NameMark.astro';
+
+const name = (await getEntry('profile', 'profile'))?.data.name ?? 'yourname';
 
 const themes = ['light', 'dark'] as const;
 
@@ -25,7 +30,7 @@ const fonts = [
 ---
 
 <BaseLayout title="Styleguide" noindex>
-  <main class="mx-auto max-w-[1400px] px-4 py-10 sm:px-8">
+  <main class="mx-auto max-w-[1400px] px-4 pt-28 pb-10 sm:px-8">
     <div class="mb-8 flex flex-wrap items-center justify-between gap-4">
       <div>
         <p class="eyebrow">dev · design system</p>
@@ -45,6 +50,14 @@ const fonts = [
             class="flex min-w-0 flex-col gap-10 rounded-xl border border-line p-5 sm:p-8"
           >
             <p class="eyebrow">{theme} mode</p>
+
+            <div>
+              <h3 class="mb-4 text-sm">Nav logo + theme toggle (logo types out on page load)</h3>
+              <div class="demo-pill">
+                <NameMark name={name} />
+                <ThemeToggle />
+              </div>
+            </div>
 
             <div>
               <h3 class="mb-4 text-sm">Colors</h3>
@@ -138,6 +151,19 @@ const fonts = [
 </BaseLayout>
 
 <style>
+  /* Mini copy of the nav pill, to see the logo and toggle in context. */
+  .demo-pill {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 20rem;
+    padding: 0.4rem 0.4rem 0.4rem 1rem;
+    border: var(--border-w) solid var(--line);
+    border-radius: 999px;
+    background: var(--surface);
+    box-shadow: var(--shadow-pop);
+  }
+
   /* Demo "packet" dot, the same idea the pipeline diagrams will use in Phase 5. */
   .packet {
     position: absolute;

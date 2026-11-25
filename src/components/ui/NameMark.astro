@@ -1,0 +1,51 @@
+---
+// Nav logo: the name types out once on load, then a purple block cursor fades in and out.
+// With Pause motion / reduced motion the animations are removed, so the full name and a static
+// block show immediately. The caller passes the name (from profile.yaml). Reads no YAML itself.
+interface Props {
+  name: string;
+}
+
+const { name } = Astro.props;
+---
+
+<span class="mark" style={`--n: ${name.length}`}>
+  <span class="typed">{name}</span>
+  <span class="cursor" aria-hidden="true"></span>
+</span>
+
+<style>
+  .mark {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--ink);
+    /* reserve the final width (name + gap + cursor) so the nav doesn't grow while typing */
+    min-width: calc(var(--n) * 1ch + 0.3rem + 0.55em);
+  }
+
+  /* Mono font, so 1ch = one letter: widen one letter per step. */
+  .typed {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    width: calc(var(--n) * 1ch);
+    animation: type calc(var(--n) * 90ms) steps(var(--n)) both;
+  }
+  @keyframes type {
+    from { width: 0; }
+  }
+
+  .cursor {
+    width: 0.55em;
+    height: 1.05em;
+    background: var(--accent-2);
+    animation: fade 1.2s ease-in-out infinite alternate;
+  }
+  @keyframes fade {
+    to { opacity: 0.15; }
+  }
+</style>

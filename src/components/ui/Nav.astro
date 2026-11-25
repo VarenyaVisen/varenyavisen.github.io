@@ -1,0 +1,195 @@
+---
+// Floating pill nav: name on the left, a link per visible section, Resume ↗, theme toggle.
+// Below lg it collapses to a Menu button that opens a native popover. Reads profile.yaml + site.yaml (via lib/sections).
+import { getEntry } from 'astro:content';
+import { Menu, X } from '@lucide/astro';
+import ThemeToggle from './ThemeToggle.astro';
+import NameMark from './NameMark.astro';
+import { sectionLabels, visibleSections } from '../../lib/sections';
+
+const profile = await getEntry('profile', 'profile');
+// "/#id" (not "#id") so the links also work from /styleguide; on "/" they just scroll.
+const links = (await visibleSections())
+  .filter((id) => id !== 'home')
+  .map((id) => ({ href: `/#${id}`, label: sectionLabels[id] }));
+---
+
+<header class="nav-wrap">
+  <nav class="nav" aria-label="Main">
+    <a href="/#home" class="logo">{profile && <NameMark name={profile.data.name} />}</a>
+
+    <ul class="desktop-links">
+      {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+    </ul>
+
+    <div class="flex items-center gap-2">
+      {profile && <a href={profile.data.resume} class="resume" target="_blank" rel="noopener">Resume ↗</a>}
+      <ThemeToggle />
+      <button type="button" class="menu-btn" popovertarget="mobile-menu" aria-label="Open menu">
+        <Menu size={20} aria-hidden="true" />
+      </button>
+    </div>
+  </nav>
+
+  <div id="mobile-menu" popover class="mobile-menu">
+    <button type="button" class="menu-close" popovertarget="mobile-menu" popovertargetaction="hide" aria-label="Close menu">
+      <X size={20} aria-hidden="true" />
+    </button>
+    <ul>
+      {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+    </ul>
+  </div>
+</header>
+
+<script>
+  // Close the mobile menu after a link is picked (popovers don't close on in-page navigation).
+  const menu = document.getElementById('mobile-menu');
+  menu?.addEventListener('click', (e) => {
+    if ((e.target as Element).closest('a')) menu.hidePopover();
+  });
+
+  // Active section: whichever section crosses a thin band ~40% down the screen gets
+  // aria-current on its nav links (CSS colors it). In the hero, no link is active.
+  const navLinks = document.querySelectorAll<HTMLAnchorElement>('.desktop-links a, .mobile-menu a');
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        for (const a of navLinks) {
+          if (a.hash === `#${entry.target.id}`) a.setAttribute('aria-current', 'true');
+          else a.removeAttribute('aria-current');
+        }
+      }
+    },
+    { rootMargin: '-40% 0px -59% 0px' },
+  );
+  for (const section of document.querySelectorAll('main section[id]')) observer.observe(section);
+</script>
+
+<style>
+  .nav-wrap {
+    position: fixed;
+    top: 1rem;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    display: flex;
+    justify-content: center;
+    padding: 0 1rem;
+    pointer-events: none; /* only the pill itself is clickable */
+  }
+
+  .nav {
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    width: 100%;
+    max-width: max-content;
+    padding: 0.4rem 0.4rem 0.4rem 1.1rem;
+    border: var(--border-w) solid var(--line);
+    border-radius: 999px;
+    background: color-mix(in srgb, var(--surface) 80%, transparent);
+    backdrop-filter: blur(10px);
+    box-shadow: var(--shadow-pop);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+  }
+
+  .logo {
+    margin-right: auto;
+    text-decoration: none;
+  }
+
+  .desktop-links {
+    display: none;
+    gap: 0.25rem;
+  }
+  .desktop-links a,
+  .mobile-menu a {
+    display: block;
+    color: var(--muted);
+    text-decoration: none;
+    border-radius: 999px;
+    transition: color 150ms ease-out, background-color 150ms ease-out;
+  }
+  .desktop-links a {
+    padding: 0.4rem 0.65rem;
+  }
+  .desktop-links a:hover,
+  .mobile-menu a:hover {
+    color: var(--ink);
+    background: var(--accent-soft);
+  }
+  .desktop-links a[aria-current],
+  .mobile-menu a[aria-current] {
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  .resume {
+    padding: 0.45rem 0.85rem;
+    border-radius: 999px;
+    background: var(--ink);
+    color: var(--bg);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .resume:hover {
+    background: var(--accent);
+    color: var(--on-accent);
+  }
+
+  .menu-btn,
+  .menu-close {
+    display: inline-grid;
+    place-items: center;
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 999px;
+    border: 1.5px solid var(--line);
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+  }
+
+  /* The popover sits in the browser's top layer; place it under the nav as a card. */
+  .mobile-menu {
+    position: fixed;
+    inset: 5rem 1rem auto 1rem;
+    width: auto; /* undo the browser's popover fit-content so it spans left→right */
+    margin: 0;
+    padding: 0.75rem;
+    border: var(--border-w) solid var(--line);
+    border-radius: var(--radius-lg);
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: var(--shadow-pop);
+    font-family: var(--font-mono);
+  }
+  .mobile-menu::backdrop {
+    background: color-mix(in srgb, var(--bg) 60%, transparent);
+  }
+  .menu-close {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+  }
+  .mobile-menu a {
+    padding: 0.7rem 1rem;
+    font-size: 1rem;
+  }
+
+  @media (min-width: 1024px) {
+    .nav {
+      gap: 1.25rem;
+    }
+    .desktop-links {
+      display: flex;
+    }
+    .menu-btn {
+      display: none;
+    }
+  }
+</style>

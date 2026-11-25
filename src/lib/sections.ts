@@ -2,6 +2,19 @@
 // A section shows if it is listed in src/data/site.yaml AND its data is not empty.
 import { getCollection, getEntry } from 'astro:content';
 
+// UI labels for nav links and section eyebrows (not personal content, so they live here).
+export const sectionLabels = {
+  home: 'Home',
+  about: 'About',
+  experience: 'Experience',
+  projects: 'Projects',
+  skills: 'Skills',
+  achievements: 'Achievements',
+  certifications: 'Certifications',
+  interests: 'Interests',
+  contact: 'Contact',
+};
+
 export async function visibleSections() {
   const site = await getEntry('site', 'site');
   const profile = await getEntry('profile', 'profile');
