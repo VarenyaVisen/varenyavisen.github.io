@@ -16,6 +16,9 @@ about:
   - "TODO: paragraph 1"
   - "TODO: paragraph 2"
 
+# Handwritten note with a doodle arrow pointing down at the sticky notes. Delete the line to hide it.
+aboutNote: "the short version"
+
 # Sticky-note cards next to About. icon = a Lucide icon name (lucide.dev/icons).
 quickFacts:
   - { icon: graduation-cap, text: "B.Tech CSE (AI/ML), Sushant University, 2025" }

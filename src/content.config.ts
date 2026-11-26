@@ -79,35 +79,39 @@ const profile = z.strictObject({
   email: text,
   resume: text,
   about: z.array(text).default([]),
+  aboutNote: text.optional(), // handwritten note pointing at the quick-fact cards
+
   quickFacts: z.array(z.strictObject({ icon: lucideIcon, text })).default([]),
   links: z.array(link).default([]),
 });
 
-const pipelineDiagram = z.strictObject({
-  type: z.literal('pipeline'),
+// Dates are "YYYY-MM" (e.g. "2025-09"); an end date may also be "present".
+const role = z.strictObject({
   title: text,
-  nodes: z.array(z.strictObject({ above: text, label: text, below: text })).min(2),
+  type: text,
+  start: text,
+  end: text,
 });
 
-const traceDiagram = z.strictObject({
-  type: z.literal('trace'),
-  title: text,
-  // Steps run one after another; each bar starts where the previous one ended.
-  steps: z.array(z.strictObject({ label: text, ms: z.number().positive() })).min(1),
+const workProject = z.strictObject({
+  name: text,
+  start: text.optional(),
+  end: text.optional(),
+  description: text,
+  did: z.array(text).min(2).max(4),
+  impact: text.optional(),
+  stack: z.array(text).default([]),
+  link: text.optional(),
 });
 
+// One entry per company. Several roles = a promotion at the same company.
 const experience = z.strictObject({
   company: text,
   companyUrl: text.optional(),
-  role: text,
-  type: text,
   location: text,
-  start: text, // e.g. "2023-07"
-  end: text, // e.g. "2025-01" or "present"
-  cameInToDo: text,
-  diagram: z.discriminatedUnion('type', [pipelineDiagram, traceDiagram]).optional(),
-  shipped: z.array(z.strictObject({ text, link: text.nullish() })).default([]),
-  stack: z.array(text).default([]),
+  summary: text.optional(),
+  roles: z.array(role).min(1),
+  projects: z.array(workProject).default([]),
 });
 
 const project = z.strictObject({

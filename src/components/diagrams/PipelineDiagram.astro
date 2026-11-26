@@ -1,0 +1,163 @@
+---
+// Pipeline diagram ("the product, end-to-end", screenshot 03): nodes in a row, each with a small label
+// above, a name and a metric below, joined by a line that "packet" dots travel along.
+// Light mode draws nodes as isometric blocks, dark mode as glowing circles. Data: experience.yaml → diagram (type: pipeline).
+interface Props {
+  title: string;
+  nodes: { above: string; label: string; below: string }[];
+}
+
+const { title, nodes } = Astro.props;
+const blockColors = ['var(--block-orange)', 'var(--block-blue)', 'var(--block-purple)'];
+---
+
+<figure class="diagram">
+  <figcaption class="eyebrow">{title}</figcaption>
+  <div class="scroll">
+    <div class="track" style={`--n: ${nodes.length}`}>
+      <div class="wire" aria-hidden="true">
+        <span class="packet"></span>
+        <span class="packet" style="animation-delay: -1.5s"></span>
+        <span class="packet" style="animation-delay: -3s"></span>
+      </div>
+      <ol class="nodes">
+        {
+          nodes.map((node, i) => (
+            <li class="node" style={`--block: ${blockColors[i % blockColors.length]}`}>
+              <span class="above">{node.above}</span>
+              <svg class="icon" viewBox="0 0 40 40" aria-hidden="true">
+                <g class="iso">
+                  <path class="top" d="M20 4 L36 12 L20 20 L4 12 Z" />
+                  <path class="left" d="M4 12 L20 20 L20 36 L4 28 Z" />
+                  <path class="right" d="M20 20 L36 12 L36 28 L20 36 Z" />
+                </g>
+                <g class="glow">
+                  <circle cx="20" cy="20" r="12" />
+                  <circle class="core" cx="20" cy="20" r="4" />
+                </g>
+              </svg>
+              <strong class="label">{node.label}</strong>
+              <span class="below">{node.below}</span>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+</figure>
+
+<style>
+  .diagram {
+    --icon: 2.75rem;
+    --above: 1rem;
+    --gap: 0.5rem;
+    margin: 0;
+    padding: 1rem 0 1.25rem;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-md);
+    background-color: var(--surface);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: var(--grid-size) var(--grid-size);
+  }
+  figcaption {
+    padding: 0 1.25rem;
+    font-size: 0.65rem;
+  }
+
+  /* On narrow screens the diagram scrolls inside its box instead of squashing or widening the page. */
+  .scroll {
+    overflow-x: auto;
+    padding: 1.5rem 0 0.25rem;
+  }
+  .track {
+    position: relative;
+    min-width: calc(var(--n) * 8rem);
+  }
+
+  /* The line runs from the first node's center to the last one's, at icon height. */
+  .wire {
+    position: absolute;
+    top: calc(var(--above) + var(--gap) + var(--icon) / 2);
+    left: calc(50% / var(--n));
+    right: calc(50% / var(--n));
+    height: 0;
+    border-top: 1.5px dashed color-mix(in srgb, var(--line) var(--is-light), var(--accent) 40%);
+  }
+  .packet {
+    position: absolute;
+    top: -0.3rem;
+    left: 0;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-left: -0.25rem;
+    border-radius: 999px;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: travel 4.5s linear infinite;
+  }
+  @keyframes travel {
+    from { left: 0; }
+    to { left: 100%; }
+  }
+
+  .nodes {
+    display: grid;
+    grid-template-columns: repeat(var(--n), 1fr);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .node {
+    position: relative; /* sits above the wire, so packets pass "through" the blocks */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--gap);
+    padding: 0 0.5rem;
+    text-align: center;
+    font-family: var(--font-mono);
+  }
+  .above {
+    height: var(--above);
+    line-height: var(--above);
+    font-size: 0.7rem;
+    color: var(--muted);
+  }
+  .label {
+    font-size: 0.85rem;
+  }
+  .below {
+    margin-top: -0.4rem;
+    font-size: 0.75rem;
+    color: var(--accent);
+  }
+
+  /* Both node styles are drawn; the theme token decides which one is visible. */
+  .icon {
+    width: var(--icon);
+    height: var(--icon);
+    overflow: visible;
+  }
+  .iso {
+    opacity: calc(1 - var(--is-dark));
+    stroke: var(--ink);
+    stroke-width: 1.5;
+    stroke-linejoin: round;
+  }
+  .iso .top { fill: var(--block); }
+  .iso .left { fill: color-mix(in srgb, var(--block), var(--ink) 15%); }
+  .iso .right { fill: color-mix(in srgb, var(--block), var(--ink) 30%); }
+  .glow {
+    opacity: var(--is-dark);
+    fill: var(--surface);
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    filter: drop-shadow(0 0 4px var(--accent));
+  }
+  .glow .core {
+    fill: var(--accent);
+    stroke: none;
+  }
+</style>

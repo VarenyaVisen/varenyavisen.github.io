@@ -11,6 +11,8 @@ import Card from '../components/ui/Card.astro';
 import SectionHeader from '../components/ui/SectionHeader.astro';
 import Annotation from '../components/ui/Annotation.astro';
 import NameMark from '../components/ui/NameMark.astro';
+import PipelineDiagram from '../components/diagrams/PipelineDiagram.astro';
+import TraceDiagram from '../components/diagrams/TraceDiagram.astro';
 
 const name = (await getEntry('profile', 'profile'))?.data.name ?? 'yourname';
 
@@ -138,9 +140,25 @@ const fonts = [
             </div>
 
             <div>
-              <h3 class="mb-4 text-sm">Motion (stops on Pause motion)</h3>
-              <div class="relative h-1 rounded-full bg-line">
-                <span class="packet" />
+              <h3 class="mb-4 text-sm">Diagrams (packets stop on Pause motion)</h3>
+              <div class="flex flex-col gap-5">
+                <PipelineDiagram
+                  title="Demo pipeline"
+                  nodes={[
+                    { above: 'ingest', label: 'events', below: 'metric' },
+                    { above: 'detect', label: 'rules', below: 'metric' },
+                    { above: 'act', label: 'resolve', below: 'metric' },
+                  ]}
+                />
+                <TraceDiagram
+                  title="Demo trace"
+                  steps={[
+                    { label: 'query', ms: 12 },
+                    { label: 'retrieve', ms: 48 },
+                    { label: 'rerank', ms: 60 },
+                    { label: 'answer', ms: 60 },
+                  ]}
+                />
               </div>
             </div>
           </section>
@@ -162,27 +180,5 @@ const fonts = [
     border-radius: 999px;
     background: var(--surface);
     box-shadow: var(--shadow-pop);
-  }
-
-  /* Demo "packet" dot, the same idea the pipeline diagrams will use in Phase 5. */
-  .packet {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 0.6rem;
-    height: 0.6rem;
-    margin-top: -0.3rem;
-    border-radius: 999px;
-    background: var(--accent);
-    box-shadow: 0 0 10px var(--accent);
-    animation: travel 2.4s ease-in-out infinite;
-  }
-  @keyframes travel {
-    from {
-      left: 0;
-    }
-    to {
-      left: calc(100% - 0.6rem);
-    }
   }
 </style>

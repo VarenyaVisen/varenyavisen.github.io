@@ -1,0 +1,128 @@
+---
+// Latency trace / waterfall (screenshot 04): steps run one after another, each bar starts where the
+// previous one ended. A "packet" dot sweeps the time axis. Light = cartoony block bars, dark = glowing accent bars.
+// Data: experience.yaml → diagram (type: trace).
+interface Props {
+  title: string;
+  steps: { label: string; ms: number }[];
+}
+
+const { title, steps } = Astro.props;
+const total = steps.reduce((sum, s) => sum + s.ms, 0);
+let start = 0;
+const rows = steps.map((s) => {
+  const row = { ...s, left: (start / total) * 100, width: (s.ms / total) * 100 };
+  start += s.ms;
+  return row;
+});
+const blockColors = ['var(--block-orange)', 'var(--block-blue)', 'var(--block-purple)'];
+---
+
+<figure class="diagram">
+  <figcaption class="eyebrow">{title}</figcaption>
+  <div class="scroll">
+    <div class="trace">
+      <span></span>
+      <div class="axis" aria-hidden="true"><span class="packet"></span></div>
+      <span></span>
+      <span></span>
+      <div class="ticks"><span>0ms</span><span>{total}ms</span></div>
+      <span></span>
+      {
+        rows.map((r, i) => (
+          <>
+            <span class="label">{r.label}</span>
+            <div class="lane">
+              <span
+                class="bar"
+                style={`left: ${r.left}%; width: ${r.width}%; --block: ${blockColors[i % blockColors.length]}`}
+              />
+            </div>
+            <span class="ms">{r.ms}ms</span>
+          </>
+        ))
+      }
+    </div>
+  </div>
+</figure>
+
+<style>
+  .diagram {
+    margin: 0;
+    padding: 1rem 0 1.25rem;
+    border: 1.5px solid var(--line);
+    border-radius: var(--radius-md);
+    background-color: var(--surface);
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: var(--grid-size) var(--grid-size);
+  }
+  figcaption {
+    padding: 0 1.25rem;
+    font-size: 0.65rem;
+  }
+  .scroll {
+    overflow-x: auto;
+    padding: 1.25rem 1.25rem 0.25rem;
+  }
+
+  .trace {
+    display: grid;
+    grid-template-columns: max-content 1fr 4rem;
+    align-items: center;
+    gap: 0.6rem 1rem;
+    min-width: 30rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+  }
+
+  .axis {
+    position: relative;
+    height: 0;
+    border-top: 1.5px dashed color-mix(in srgb, var(--line) var(--is-light), var(--accent) 40%);
+  }
+  .ticks {
+    display: flex;
+    justify-content: space-between;
+    margin-top: -0.4rem;
+    color: var(--muted);
+  }
+  .packet {
+    position: absolute;
+    top: -0.3rem;
+    left: 0;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-left: -0.25rem;
+    border-radius: 999px;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+    animation: sweep 3s linear infinite;
+  }
+  @keyframes sweep {
+    from { left: 0; }
+    to { left: 100%; }
+  }
+
+  .label {
+    font-weight: 700;
+  }
+  .lane {
+    position: relative;
+    height: 0.9rem;
+  }
+  .bar {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    min-width: 2px;
+    border-radius: 3px;
+    border: 1.5px solid color-mix(in srgb, var(--ink) var(--is-light), transparent);
+    background: color-mix(in srgb, var(--block) var(--is-light), var(--accent));
+    box-shadow: 0 0 calc(var(--is-dark) * 10px) color-mix(in srgb, var(--accent) 60%, transparent);
+  }
+  .ms {
+    color: var(--accent);
+  }
+</style>

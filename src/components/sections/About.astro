@@ -1,0 +1,69 @@
+---
+// About: short paragraphs on the left, tilted "sticky note" quick-fact cards (with Lucide icons) on the
+// right, and an optional handwritten note pointing at them. Reads profile.yaml → about, quickFacts, aboutNote.
+import { getEntry } from 'astro:content';
+import { icons } from '@lucide/astro';
+import Annotation from '../ui/Annotation.astro';
+
+const profile = (await getEntry('profile', 'profile'))!.data;
+
+// YAML uses Lucide's file names ("graduation-cap"); the package exports PascalCase ("GraduationCap").
+const iconFor = (name: string) =>
+  icons[name.replace(/(^|-)(\w)/g, (_, __, c: string) => c.toUpperCase()) as keyof typeof icons];
+
+const noteColors = ['var(--block-orange)', 'var(--block-blue)', 'var(--block-purple)'];
+const tilts = [-2, 1.5, -1, 2];
+---
+
+<div class="grid gap-12 md:grid-cols-[1.3fr_1fr] md:gap-16">
+  <div class="flex max-w-2xl flex-col gap-5 text-lg">
+    {profile.about.map((p) => <p>{p}</p>)}
+  </div>
+
+  {
+    profile.quickFacts.length > 0 && (
+      <div>
+        {profile.aboutNote && <Annotation text={profile.aboutNote} arrow="down" class="mb-2 ml-4" />}
+        <ul class="grid gap-5 sm:grid-cols-2">
+          {profile.quickFacts.map((fact, i) => {
+            const Icon = iconFor(fact.icon);
+            return (
+              <li
+                class="note"
+                style={`--note: ${noteColors[i % noteColors.length]}; --tilt: ${tilts[i % tilts.length]}deg`}
+              >
+                <Icon size={20} aria-hidden="true" />
+                <span>{fact.text}</span>
+              </li>
+            );
+          })}
+        </ul>
+      </div>
+    )
+  }
+</div>
+
+<style>
+  /* Light: filled paper note with ink outline + hard shadow. Dark: dark card with colored outline + icon. */
+  .note {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1rem 1.1rem 1.25rem;
+    border: var(--border-w) solid color-mix(in srgb, var(--line) var(--is-light), color-mix(in srgb, var(--note) 50%, transparent));
+    border-radius: var(--radius-sm);
+    background: color-mix(in srgb, var(--note) var(--is-light), var(--surface));
+    box-shadow: var(--shadow-pop);
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    transform: rotate(var(--tilt));
+    transition: transform 200ms ease-out;
+  }
+  .note:hover {
+    transform: rotate(0deg) translateY(-2px);
+  }
+  .note :global(svg) {
+    color: color-mix(in srgb, var(--ink) var(--is-light), var(--note));
+  }
+</style>
