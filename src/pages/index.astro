@@ -7,6 +7,7 @@ import SectionHeader from '../components/ui/SectionHeader.astro';
 import Hero from '../components/sections/Hero.astro';
 import About from '../components/sections/About.astro';
 import Experience from '../components/sections/Experience.astro';
+import Interests from '../components/sections/Interests.astro';
 import { sectionLabels, visibleSections } from '../lib/sections';
 
 const sections = await visibleSections();
@@ -20,7 +21,7 @@ const numbered = sections.filter((id) => id !== 'home'); // the hero gets no "01
     ) : (
       <section id={id} class="mx-auto min-h-[70vh] max-w-6xl scroll-mt-24 px-4 py-24 sm:px-8">
         <SectionHeader index={numbered.indexOf(id) + 1} label={sectionLabels[id]} title={sectionLabels[id]} />
-        {id === 'about' ? <About /> : id === 'experience' ? <Experience /> : (
+        {id === 'about' ? <About /> : id === 'experience' ? <Experience /> : id === 'interests' ? <Interests /> : (
           <p class="mt-8 rounded-md border border-dashed border-line p-6 font-mono text-sm text-muted">
             {sectionLabels[id]} section · coming in a later phase
           </p>

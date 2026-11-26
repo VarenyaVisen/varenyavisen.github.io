@@ -1,35 +1,34 @@
 # Who you are. Used by the Hero, About and Contact sections.
-name: Varenya
-headline: Software Engineer · AI/ML
-eyebrow: "SOFTWARE ENGINEER · KELLTON · PYTHON / GENAI"
-tagline: "TODO: one punchy italic line"
-intro: "Software engineer at Kellton Tech Solutions, building RAG pipelines, LLM-assisted verification and ML models behind FastAPI services."
+name: Varenya Visen
+headline: Software Engineer · AI/ML & GenAI
+eyebrow: "SOFTWARE ENGINEER · KELLTON · AI / ML"
+# Other options: "LLMs, logs, and a lot of tests." / "Backend engineer with an AI habit."
+tagline: "I build AI that survives production."
+intro: "Software engineer working across machine learning and GenAI: RAG pipelines, LLM-powered systems, and ML models, built in Python."
 # Hero buttons: the first scrolls to Experience, the second to Contact.
 workButton: "See my work ↓"
 contactButton: "Get in touch →"
-location: India
+location: "Delhi, India"
 email: varenyavisen@gmail.com
-resume: /resume.pdf
+resume: /resume.pdf   # the version without a phone number
 
 # About section paragraphs. Empty list ([]) hides the About section.
 about:
-  - "TODO: paragraph 1"
-  - "TODO: paragraph 2"
+  - "I'm a software engineer who builds AI and ML systems that hold up in the real world: RAG pipelines, LLM-powered tools, and models that turn messy data into decisions."
+  - "I care most about what happens after the demo: evaluation, edge cases, and the bugs nobody sees coming. When I'm not training models, I'm gaming, trekking up a mountain, or riding somewhere with no fixed plan."
 
 # Handwritten note with a doodle arrow pointing down at the sticky notes. Delete the line to hide it.
 aboutNote: "the short version"
 
 # Sticky-note cards next to About. icon = a Lucide icon name (lucide.dev/icons).
 quickFacts:
-  - { icon: graduation-cap, text: "B.Tech CSE (AI/ML), Sushant University, 2025" }
-  - { icon: map-pin, text: "India" }
-  - { icon: briefcase, text: "Software Engineer @ Kellton Tech Solutions" }
+  - { icon: briefcase, text: "Software Engineer · AI/ML" }
+  - { icon: graduation-cap, text: "B.Tech CSE (AI/ML), Sushant University" }
+  - { icon: brain-circuit, text: "RAG · LangGraph · AI agents" }
+  - { icon: map-pin, text: "Delhi, India" }
 
 # Social links. icon = a Simple Icons slug (simpleicons.org), optional.
 # LinkedIn has no icon: Simple Icons removed its logo, so it shows as a text label.
 links:
   - { label: GitHub, url: "https://github.com/VarenyaVisen", icon: github }
-  - { label: LinkedIn, url: "https://linkedin.com/in/varenya-visen" }
-  # - { label: Codeforces, url: TODO, icon: codeforces }
-  # - { label: LeetCode, url: TODO, icon: leetcode }
-  # - { label: X, url: TODO, icon: x }
+  - { label: LinkedIn, url: "https://www.linkedin.com/in/varenya-visen" }

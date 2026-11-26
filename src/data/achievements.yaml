@@ -1,19 +1,19 @@
 # "Achievement unlocked" cards. rarity: gold | silver | bronze. icon = a Lucide icon name.
-- title: Candidate Master
-  subtitle: Codeforces
+# subtitle (e.g. who awarded it) and link are optional.
+- title: Best Final Year Project
+  description: "Power BI dashboard on academic performance across 6 departments"
   rarity: gold
+  icon: award
+  date: "2025"
+
+- title: "Top 5% · SQL HackerRank Challenge"
+  description: "Top 150 of 3,000+ participants"
+  rarity: silver
   icon: trophy
-  date: TODO
-  link: TODO
+  date: "2024"
 
-- title: ICPC Regionalist
-  subtitle: ICPC
-  rarity: silver
-  icon: medal
-  date: TODO
-
-- title: Meta Hacker Cup, Round 2
-  subtitle: Meta
-  rarity: silver
-  icon: flag
-  date: TODO
+- title: "RAG Triad, passed"
+  description: "92% context relevance · 95% groundedness · 92% answer relevance"
+  rarity: bronze
+  icon: target
+  date: "2026"

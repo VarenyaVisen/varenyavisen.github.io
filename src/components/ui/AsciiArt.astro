@@ -1,0 +1,79 @@
+---
+// Static ASCII drawing in the hero's style: "#" cells become bold code characters (a few green or purple,
+// glowing in dark mode), "." cells a faint field of code. Scales to fit its container's width.
+// Reads no YAML; the caller passes the rows (e.g. interests.yaml → art).
+import { asciiCode } from '../../lib/ascii';
+
+interface Props {
+  rows: string[];
+  class?: string;
+}
+const { rows, class: className } = Astro.props;
+
+const ACCENT_RATE = 0.12; // share of shape characters drawn green or purple (same as the hero)
+const code = asciiCode.replaceAll(' ', '·'); // background: spaces would leave holes
+const dense = asciiCode.replaceAll(' ', ''); // shape: no spaces or dots, so it reads solid at small sizes
+// Same "random" number for a cell on every build, so the drawing never changes between deploys.
+const rand = (i: number) => {
+  const x = Math.sin(i * 12.9898) * 43758.5453;
+  return x - Math.floor(x);
+};
+
+// Each line becomes a few runs of same-styled characters (one <span> per run, not per character).
+const lines = rows.map((row, r) =>
+  [...row].reduce<{ cls: string; text: string }[]>((runs, cell, c) => {
+    const i = r * row.length + c;
+    const a = rand(i);
+    const cls = cell === '.' ? 'bg' : a < ACCENT_RATE / 2 ? 'a1' : a < ACCENT_RATE ? 'a2' : 'fg';
+    const ch = cell === '.' ? code[Math.floor(rand(i + 999) * code.length)] : dense[i % dense.length];
+    const last = runs.at(-1);
+    if (last?.cls === cls) last.text += ch;
+    else runs.push({ cls, text: ch });
+    return runs;
+  }, []),
+);
+---
+
+<div class:list={['ascii-art', className]} style={`--cols: ${rows[0]?.length ?? 1}`} aria-hidden="true">
+  <pre>{lines.map((runs) => <span class="line">{runs.map((run) => <span class={run.cls}>{run.text}</span>)}</span>)}</pre>
+</div>
+
+<style>
+  .ascii-art {
+    container-type: inline-size; /* lets the font size follow this box's width */
+    width: 100%;
+    overflow: hidden;
+    user-select: none;
+  }
+  pre {
+    width: fit-content;
+    margin: 0 auto; /* centered when the size cap leaves spare width */
+    font-family: var(--font-mono);
+    /* A JetBrains Mono character is 0.6em wide, so this fits all columns, capped at a readable size. */
+    font-size: min(0.8rem, calc(100cqi / var(--cols) / 0.6));
+    line-height: 1.2;
+    white-space: pre;
+  }
+  .line {
+    display: block;
+  }
+  .bg {
+    color: var(--ink);
+    opacity: calc(0.07 + var(--is-dark) * 0.02); /* faint, so the shape reads clearly at small sizes */
+  }
+  .fg,
+  .a1,
+  .a2 {
+    font-weight: 700;
+    text-shadow: 0 0 8px color-mix(in srgb, currentColor calc(var(--is-dark) * 70%), transparent);
+  }
+  .fg {
+    color: var(--ink);
+  }
+  .a1 {
+    color: var(--accent);
+  }
+  .a2 {
+    color: var(--accent-2);
+  }
+</style>

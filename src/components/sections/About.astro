@@ -44,16 +44,19 @@ const tilts = [-2, 1.5, -1, 2];
 </div>
 
 <style>
-  /* Light: filled paper note with ink outline + hard shadow. Dark: dark card with colored outline + icon. */
+  /* Light: filled paper note with ink outline + hard ink shadow.
+     Dark: dark card whose border, icon and soft glow are all the note's own colour (same strength on every note).
+     --is-light / --is-dark (tokens.css) switch between the two without theme selectors. */
   .note {
     display: flex;
     flex-direction: column;
     gap: 0.75rem;
     padding: 1rem 1.1rem 1.25rem;
-    border: var(--border-w) solid color-mix(in srgb, var(--line) var(--is-light), color-mix(in srgb, var(--note) 50%, transparent));
+    border: var(--border-w) solid color-mix(in srgb, var(--line) var(--is-light), var(--note));
     border-radius: var(--radius-sm);
     background: color-mix(in srgb, var(--note) var(--is-light), var(--surface));
-    box-shadow: var(--shadow-pop);
+    box-shadow: calc(3px - 3px * var(--is-dark)) calc(3px - 3px * var(--is-dark)) calc(18px * var(--is-dark))
+      calc(-8px * var(--is-dark)) color-mix(in srgb, var(--ink) var(--is-light), color-mix(in srgb, var(--note) 45%, transparent));
     font-family: var(--font-mono);
     font-size: 0.9rem;
     line-height: 1.4;

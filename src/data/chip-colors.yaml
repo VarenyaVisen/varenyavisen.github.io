@@ -1,0 +1,47 @@
+# Chip colours mean a category, everywhere chips appear (experience stack, project tags, skills).
+# Add a tech name to one list. Matching ignores upper/lower case. A name in no list shows as a plain chip.
+purple: # AI / ML / GenAI
+  - Azure OpenAI
+  - RapidFuzz
+  - XGBoost
+  - Optuna
+  - Scikit-learn
+  - PyTorch
+  - TensorFlow
+  - Hugging Face
+  - OpenCV
+  - LangChain
+  - LangGraph
+  - Chroma
+  - RAG
+  - Hybrid Search
+  - Reranking
+  - RAG Evaluation
+  - AI Agents
+  - Tool Calling
+  - Feature Engineering
+
+blue: # backend / APIs / infra
+  - FastAPI
+  - REST APIs
+  - Celery
+  - MongoDB
+  - Beanie
+  - PostgreSQL
+  - Microsoft Azure
+  - Azure Blob Storage
+  - CI/CD
+
+orange: # languages / data / tools
+  - Python
+  - SQL
+  - Pandas
+  - NumPy
+  - Pytest
+  - Power BI
+  - EDA
+  - Data Viz
+  - Dashboards
+  - Git
+  - GitHub
+  - Log-Based Debugging

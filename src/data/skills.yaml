@@ -3,13 +3,13 @@
   items: [Python, SQL, FastAPI, REST APIs, Celery, Pytest]
 
 - category: GenAI & LLMs
-  items: ["RAG (Hybrid Search, Reranking, Evaluation)", LangChain, LangGraph, AI Agents, Tool Calling, Azure OpenAI]
+  items: [RAG, Hybrid Search, Reranking, RAG Evaluation, LangChain, LangGraph, AI Agents, Tool Calling, Azure OpenAI]
 
 - category: Machine Learning
-  items: [Scikit-learn, PyTorch, TensorFlow, Hugging Face, Feature Engineering, Pandas, NumPy]
+  items: [Scikit-learn, PyTorch, TensorFlow, Hugging Face, XGBoost, Feature Engineering, Pandas, NumPy]
 
 - category: Databases
-  items: [MongoDB, PostgreSQL, Chroma (Vector Store)]
+  items: [MongoDB, PostgreSQL, Chroma]
 
-- category: Deployment & Monitoring
-  items: [Microsoft Azure, Git, GitHub, CI/CD Pipelines, Log-Based Debugging]
+- category: Cloud & Tools
+  items: [Microsoft Azure, Git, GitHub, CI/CD, Log-Based Debugging]

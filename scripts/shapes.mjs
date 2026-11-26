@@ -86,6 +86,37 @@ render('big-o', (x, y) => {
   return o || open || one || close;
 });
 
+// Used by the Interests cards (interests.yaml → art), not the hero.
+render('mountains', (x, y) => {
+  // Two ranges: a tall back range and a lower front range, split by a thin gap along the front ridge.
+  const ridge = (peaks, slope) => Math.min(...peaks.map(([px, py]) => py + slope * Math.abs(x - px)));
+  // Portrait-shaped (about 32 wide x 22 tall) so it fills the tall Interests card.
+  if (x > 32) return false;
+  const back = ridge([[17, 2], [30, 16]], 1.9);
+  const front = ridge([[6, 20], [25, 28]], 2.2);
+  if (y < back && y < front) return false;
+  if (y >= back && y < front && y >= front - 3) return false; // gap that separates the ranges
+  // Snow line on the big peak: a zigzag gap.
+  const snow = 13 + (Math.floor(x / 2) % 2) * 2;
+  if (y < front - 3 && Math.abs(y - snow) < 1 && Math.abs(x - 17) < 7) return false;
+  return true;
+});
+
+render('bike', (x, y) => {
+  const t = 1.5; // frame stroke half-width (thick enough to read when drawn in code characters)
+  const wheels = [[10, 30], [38, 30]].some(([cx, cy]) => Math.abs(circ(x, y, cx, cy) - 9) < 2);
+  const hubs = [[10, 30], [38, 30]].some(([cx, cy]) => circ(x, y, cx, cy) < 1.6);
+  const frame = [
+    [10, 30, 22, 30], [22, 30, 18, 13], [18, 13, 10, 30], // rear triangle
+    [18, 15, 33, 15], [33, 15, 22, 30], // top + down tube
+    [33, 11, 38, 30], // fork
+    [14, 11, 22, 11], // saddle
+    [31, 7, 33, 11], [29, 7, 34, 7], // stem + handlebar
+  ].some(([ax, ay, bx, by]) => seg(x, y, ax, ay, bx, by) < t);
+  const crank = circ(x, y, 22, 30) < 1.9;
+  return wheels || hubs || frame || crank;
+});
+
 render('trophy', (x, y) => {
   const cup = box(x, y, 12, 2, 36, 12) || (y >= 12 && ((x - 24) / 12) ** 2 + ((y - 12) / 16) ** 2 < 1);
   const rim = box(x, y, 12, 6, 36, 7.9);

@@ -1,9 +1,10 @@
 # Site-wide settings.
-title: "Varenya · Backend Engineer"
-description: "TODO: one-sentence description for search engines and link previews"
+title: "Varenya Visen · Software Engineer (AI/ML & GenAI)"
+description: "Varenya Visen is a software engineer working on machine learning and GenAI: RAG pipelines, LLM-powered systems and ML models in Python."
 
 # Page sections in order. Delete a line to hide that section (and its nav link).
 # A section is also hidden automatically when its YAML file is empty ([]).
+# Certifications show as a group inside Achievements. Interests is on the page but not in the nav.
 sections:
   - home
   - about
@@ -11,6 +12,5 @@ sections:
   - projects
   - skills
   - achievements
-  - certifications
   - interests
   - contact

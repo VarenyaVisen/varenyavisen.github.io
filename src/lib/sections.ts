@@ -10,10 +10,12 @@ export const sectionLabels = {
   projects: 'Projects',
   skills: 'Skills',
   achievements: 'Achievements',
-  certifications: 'Certifications',
   interests: 'Interests',
   contact: 'Contact',
 };
+
+// Sections that stay on the page but get no nav link.
+export const notInNav = ['home', 'interests'];
 
 export async function visibleSections() {
   const site = await getEntry('site', 'site');
@@ -27,8 +29,9 @@ export async function visibleSections() {
     experience: (await getCollection('experience')).length > 0,
     projects: (await getCollection('projects')).length > 0,
     skills: (await getCollection('skills')).length > 0,
-    achievements: (await getCollection('achievements')).length > 0,
-    certifications: (await getCollection('certifications')).length > 0,
+    // Certifications are a group inside Achievements, so either one keeps the section.
+    achievements:
+      (await getCollection('achievements')).length + (await getCollection('certifications')).length > 0,
     interests: (await getCollection('interests')).length > 0,
   };
 

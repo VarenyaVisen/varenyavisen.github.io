@@ -4,6 +4,7 @@
 // Animation tuning knobs (speed, hold time, density, glow) are the constants at the top of the <script>.
 import { getCollection, getEntry } from 'astro:content';
 import Button from '../ui/Button.astro';
+import { asciiCode } from '../../lib/ascii';
 
 interface Props {
   sections: string[]; // visible section ids, so buttons never point at a hidden section
@@ -22,8 +23,8 @@ const aspect = `${cols * 0.6} / ${rows * 1.2}`;
 const workHref = ['experience', 'projects'].find((id) => sections.includes(id));
 const showContact = sections.includes('contact');
 
-// Decorative code the noise and shapes are made of (also the faint background field). Not personal content.
-const code = `func (s *Server) Handle(ctx context.Context, req *Request) (*Response, error) { if err := s.limiter.Wait(ctx); err != nil { return nil, err } order, err := s.store.Get(ctx, req.OrderID); if err != nil { return nil, fmt.Errorf("get order: %w", err) } for _, rule := range s.rules { if rule.Match(order) { s.queue.Publish(ctx, rule.Action(order)) } } return &Response{Status: http.StatusOK}, nil } type Node struct { next atomic.Pointer[Node]; val int64 } func (q *Queue) Push(v int64) { n := &Node{val: v}; for { tail := q.tail.Load(); if tail.next.CompareAndSwap(nil, n) { q.tail.CompareAndSwap(tail, n); return } } } SELECT id, status FROM orders WHERE updated_at > NOW() - INTERVAL 5 MINUTE; `;
+// The noise, shapes and faint background field are made of this decorative code (shared with AsciiArt).
+const code = asciiCode;
 const backgroundCode = code.repeat(12);
 ---
 

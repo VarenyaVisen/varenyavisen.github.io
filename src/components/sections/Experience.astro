@@ -1,9 +1,10 @@
 ---
 // Experience: one block per company, newest first. Company + location + overall dates, then each role
 // (title, type badge), an optional summary, and the projects built there (description, what I did,
-// impact, stack chips, optional link). No diagrams or motion. Reads experience.yaml.
+// impact, stack chips, optional link). No diagrams or motion. Reads experience.yaml (chip colours via TechChip).
 import { getCollection } from 'astro:content';
 import Badge from '../ui/Badge.astro';
+import TechChip from '../ui/TechChip.astro';
 
 // Overall dates per company come from its roles: earliest start – latest end ("present" wins).
 const companies = (await getCollection('experience'))
@@ -58,42 +59,49 @@ const range = (start: string, end?: string) => (end ? `${month(start)} – ${mon
             ))}
           </ul>
 
-          {job.summary && <p class="mt-4 max-w-3xl text-lg">{job.summary}</p>}
+          {job.summary && <p class="mt-4 max-w-[38rem] text-lg">{job.summary}</p>}
 
           {job.projects.length > 0 && (
             <>
               <p class="eyebrow mt-10 mb-2">Projects</p>
               <ul class="border-t border-dashed border-line">
                 {job.projects.map((project) => (
-                  <li class="border-b border-dashed border-line py-8">
-                    <div class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
-                      <h4 class="text-lg">{project.name}</h4>
-                      {project.start && <span class="font-mono text-xs text-muted">{range(project.start, project.end)}</span>}
-                    </div>
-                    <p class="mt-2 max-w-3xl text-muted">{project.description}</p>
-
-                    <ul class="mt-4 flex max-w-3xl flex-col gap-2">
-                      {project.did.map((item) => (
-                        <li class="flex gap-3">
-                          <span class="font-mono text-muted" aria-hidden="true">→</span>
-                          <span class="min-w-0">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-
-                    {project.impact && (
-                      <p class="impact mt-4 max-w-3xl">
-                        <span class="eyebrow">Impact</span>
-                        <span>{project.impact}</span>
+                  // Mobile: one column (title, dates, text, stack). lg+: text on the left (~70 characters wide),
+                  // dates + stack chips in a right-hand column.
+                  <li class="project grid gap-y-2 border-b border-dashed border-line py-8 lg:gap-x-12">
+                    <h4 class="text-lg">{project.name}</h4>
+                    {project.start && (
+                      <p class="font-mono text-xs text-muted lg:col-start-2 lg:row-start-1 lg:pt-1.5">
+                        {range(project.start, project.end)}
                       </p>
                     )}
 
+                    <div class="lg:col-start-1 lg:row-start-2">
+                      <p class="text-muted">{project.description}</p>
+
+                      <ul class="mt-4 flex flex-col gap-2">
+                        {project.did.map((item) => (
+                          <li class="flex gap-3">
+                            <span class="font-mono text-muted" aria-hidden="true">→</span>
+                            <span class="min-w-0">{item}</span>
+                          </li>
+                        ))}
+                      </ul>
+
+                      {project.impact && (
+                        <p class="impact mt-4">
+                          <span class="eyebrow">Impact</span>
+                          <span>{project.impact}</span>
+                        </p>
+                      )}
+                    </div>
+
                     {(project.stack.length > 0 || project.link) && (
-                      <div class="mt-5 flex flex-wrap items-center justify-between gap-4">
+                      <div class="mt-3 flex flex-col items-start gap-4 lg:col-start-2 lg:row-start-2 lg:mt-0">
                         <ul class="flex flex-wrap gap-2" aria-label="Stack">
                           {project.stack.map((tech, i) => (
                             <li>
-                              <Badge color={(['orange', 'blue', 'purple'] as const)[i % 3]} tilt={i % 2 ? 1 : -1}>{tech}</Badge>
+                              <TechChip name={tech} tilt={i % 2 ? 1 : -1} />
                             </li>
                           ))}
                         </ul>
@@ -116,6 +124,12 @@ const range = (start: string, end?: string) => (end ? `${month(start)} – ${mon
 </ol>
 
 <style>
+  @media (min-width: 1024px) {
+    .project {
+      grid-template-columns: minmax(0, 38rem) minmax(0, 1fr); /* 38rem ≈ 70 characters of body text */
+    }
+  }
+
   /* Metrics callout: accent tint, mono text. */
   .impact {
     display: flex;

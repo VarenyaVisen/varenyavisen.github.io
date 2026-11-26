@@ -5,12 +5,12 @@ import { getEntry } from 'astro:content';
 import { Menu, X } from '@lucide/astro';
 import ThemeToggle from './ThemeToggle.astro';
 import NameMark from './NameMark.astro';
-import { sectionLabels, visibleSections } from '../../lib/sections';
+import { notInNav, sectionLabels, visibleSections } from '../../lib/sections';
 
 const profile = await getEntry('profile', 'profile');
 // "/#id" (not "#id") so the links also work from /styleguide; on "/" they just scroll.
 const links = (await visibleSections())
-  .filter((id) => id !== 'home')
+  .filter((id) => !notInNav.includes(id))
   .map((id) => ({ href: `/#${id}`, label: sectionLabels[id] }));
 ---
 
@@ -37,6 +37,7 @@ const links = (await visibleSections())
     </button>
     <ul>
       {links.map((l) => <li><a href={l.href}>{l.label}</a></li>)}
+      {profile && <li class="menu-resume"><a href={profile.data.resume} target="_blank" rel="noopener">Resume ↗</a></li>}
     </ul>
   </div>
 </header>
@@ -179,6 +180,19 @@ const links = (await visibleSections())
   .mobile-menu a {
     padding: 0.7rem 1rem;
     font-size: 1rem;
+  }
+
+  /* On very narrow phones the full name + Resume pill don't fit in the bar, so Resume moves into the menu. */
+  .menu-resume {
+    display: none;
+  }
+  @media (max-width: 420px) {
+    .resume {
+      display: none;
+    }
+    .menu-resume {
+      display: block;
+    }
   }
 
   @media (min-width: 1024px) {

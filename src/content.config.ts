@@ -35,8 +35,9 @@ function yamlFile(name: string): Loader {
         for (const entry of entries) store.set(entry);
       };
       // Watch before the first load, so fixing a broken file recovers without restarting the dev server.
+      // 'add' / 'unlink' too: creating or deleting the file while the dev server runs should also update the page.
       watcher?.add(filePath);
-      watcher?.on('change', (changed) => {
+      const onFileEvent = (changed: string) => {
         if (resolve(changed) !== resolve(filePath)) return; // resolve(): Windows paths come in either slash style
         sync()
           .then(() => logger.info(`src/data/${name}.yaml reloaded`))
@@ -46,7 +47,8 @@ function yamlFile(name: string): Loader {
                 `  ${e instanceof Error ? e.message : String(e)}\n`,
             ),
           );
-      });
+      };
+      for (const event of ['add', 'change', 'unlink']) watcher?.on(event, onFileEvent);
       await sync(); // first load: an error stops the build / dev start
     },
   };
@@ -57,7 +59,7 @@ const text = z.string().min(1);
 // Brand logos come from Simple Icons (simpleicons.org); every other icon is a Lucide name.
 const brandSlugs = new Set(Object.values(simpleIcons).map((i) => i.slug));
 const brandIcon = z.string().refine((slug) => brandSlugs.has(slug), {
-  message: 'not a Simple Icons slug (look it up at simpleicons.org, e.g. github, codeforces, leetcode, x)',
+  message: 'not a Simple Icons slug (look it up at simpleicons.org, e.g. github, leetcode, x)',
 });
 // Lucide names = the icon files in @lucide/astro (same names as `@lucide/astro/icons/<name>`).
 const lucideNames = new Set(
@@ -76,9 +78,8 @@ const site = z.strictObject({
   title: text,
   description: text,
   // Order of the page sections and nav links. Remove a line to hide that section.
-  sections: z.array(
-    z.enum(['home', 'about', 'experience', 'projects', 'skills', 'achievements', 'certifications', 'interests', 'contact']),
-  ),
+  // (Certifications have no section of their own: they show inside Achievements.)
+  sections: z.array(z.enum(['home', 'about', 'experience', 'projects', 'skills', 'achievements', 'interests', 'contact'])),
 });
 
 const profile = z.strictObject({
@@ -131,11 +132,21 @@ const experience = z.strictObject({
 const project = z.strictObject({
   title: text,
   oneLiner: text,
+  start: text.optional(),
+  end: text.optional(),
   highlight: text.optional(),
+  details: z.array(text).default([]),
   tags: z.array(text).default([]),
   repo: text.optional(),
   demo: text.optional(),
   featured: z.boolean().default(false),
+});
+
+// Which colour each stack/skill chip gets, by category. Names match case-insensitively; unlisted names are plain.
+const chipColors = z.strictObject({
+  purple: z.array(text).default([]), // AI / ML / GenAI
+  blue: z.array(text).default([]), // backend / APIs / infra
+  orange: z.array(text).default([]), // languages / data / tools
 });
 
 const skillGroup = z.strictObject({
@@ -145,7 +156,8 @@ const skillGroup = z.strictObject({
 
 const achievement = z.strictObject({
   title: text,
-  subtitle: text,
+  subtitle: text.optional(),
+  description: text.optional(),
   rarity: z.enum(['gold', 'silver', 'bronze']),
   icon: lucideIcon,
   date: text.optional(),
@@ -156,9 +168,16 @@ const certification = z.strictObject({
   name: text,
   issuer: text,
   date: text,
+  description: text.optional(),
   url: text.optional(),
   logo: text.optional(),
 });
+
+// A text drawing: rows of "#" (part of the shape) and "." (background), all the same width.
+const asciiRows = z
+  .array(z.string().regex(/^[#.]+$/, 'rows may only contain "#" and "."'))
+  .min(1)
+  .refine((rows) => rows.every((r) => r.length === rows[0].length), { message: 'every row must be the same width' });
 
 const interest = z.strictObject({
   title: text,
@@ -166,19 +185,11 @@ const interest = z.strictObject({
   layout: z.enum(['wide', 'tall', 'square']),
   kind: z.enum(['stack', 'carousel', 'plain']),
   note: text.optional(),
-  images: z.array(text).default([]), // paths inside src/assets/
+  art: asciiRows.optional(), // small ASCII drawing shown on the card
+  images: z.array(text).default([]), // paths inside src/assets/ (optional; not shown on the page yet)
 });
 
-// A text drawing: rows of "#" (part of the shape) and "." (background), all the same width.
-const heroShape = z
-  .strictObject({
-    name: text,
-    rows: z.array(z.string().regex(/^[#.]+$/, 'rows may only contain "#" and "."')).min(1),
-  })
-  .refine((s) => s.rows.every((r) => r.length === s.rows[0].length), {
-    message: 'every row must be the same width',
-    path: ['rows'],
-  });
+const heroShape = z.strictObject({ name: text, rows: asciiRows });
 
 export const collections = {
   site: defineCollection({ loader: yamlFile('site'), schema: site }),
@@ -186,6 +197,7 @@ export const collections = {
   experience: defineCollection({ loader: yamlFile('experience'), schema: experience }),
   projects: defineCollection({ loader: yamlFile('projects'), schema: project }),
   skills: defineCollection({ loader: yamlFile('skills'), schema: skillGroup }),
+  chipColors: defineCollection({ loader: yamlFile('chip-colors'), schema: chipColors }),
   achievements: defineCollection({ loader: yamlFile('achievements'), schema: achievement }),
   certifications: defineCollection({ loader: yamlFile('certifications'), schema: certification }),
   interests: defineCollection({ loader: yamlFile('interests'), schema: interest }),

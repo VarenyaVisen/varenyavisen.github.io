@@ -48,15 +48,15 @@ Requires Node.js 22.12+ (24 LTS recommended).
 ├── #experience       Experience
 ├── #projects         Projects
 ├── #skills           Skills
-├── #achievements     Achievements (competitive programming and more)
-├── #certifications   Certifications
-├── #interests        Personal interests (gaming, etc.)
+├── #achievements     Achievements (with Certifications as a group inside)
+├── #interests        Personal interests (gaming, etc.); on the page, not in the nav
 └── #contact          Contact + footer
 /styleguide           (dev only) every token, button, card and badge in both themes
 /resume.pdf           in /public
 ```
 
 Nav order comes from one list in `src/data/site.yaml`. A section whose data is empty disappears from the page and the nav.
+Sections left out of the nav are listed in `notInNav` in `src/lib/sections.ts`.
 
 ---
 
@@ -90,7 +90,7 @@ Portfolio/
 │   ├── components/
 │   │   ├── ui/                ← Button, Badge, Card, SectionHeader, Annotation, ThemeToggle, MotionToggle
 │   │   ├── diagrams/          ← PipelineDiagram, TraceDiagram, IsoBlock
-│   │   └── sections/          ← Hero, About, Experience, Projects, Skills, Achievements, Certifications, Interests, Contact
+│   │   └── sections/          ← Hero, About, Experience, Projects, Skills, Achievements (incl. certifications), Interests, Contact
 │   ├── layouts/BaseLayout.astro   ← <head>, fonts, theme script, nav, footer
 │   └── pages/
 │       ├── index.astro
@@ -153,8 +153,8 @@ The ThemeToggle is a sun/moon icon that rotates when swapped (the moon can wear 
 On mobile it collapses to a menu button.
 
 ### Hero (`profile.yaml`)
-- Eyebrow: `SDE-II · ZOMATO · GO / PHP →`
-- Title: name in big bold mono. Second line in italic muted mono (e.g. *"I build the boring parts that never go down."*). The tagline comes from YAML.
+- Eyebrow: `SOFTWARE ENGINEER · KELLTON · PYTHON / GENAI`
+- Title: name in big bold mono. Second line in italic muted mono (e.g. *"I build AI that survives production."*). The tagline comes from YAML.
 - One-sentence intro + two buttons: `See my work ↓` (chunky) and `Get in touch →` (text link).
 - Right side: an animated **"diffusion" ASCII canvas** (inspired by screenshot 01). No photo.
   - Background: dim code characters.
@@ -166,7 +166,7 @@ On mobile it collapses to a menu button.
 
 ### About (`profile.yaml → about, quickFacts`)
 - Left: 2–3 short paragraphs.
-- Right: 3–4 "sticky note" quick-fact cards, slightly rotated, each with a Lucide icon: `IIT Dhanbad`, `India`, `currently into low-latency C++`, `…`
+- Right: 3–4 "sticky note" quick-fact cards, slightly rotated, each with a Lucide icon: `Software Engineer @ Kellton`, `B.Tech CSE (AI/ML), Sushant University`, `RAG · LangGraph · AI agents`, `…`
 - One handwritten annotation pointing at something fun.
 
 ### Experience (`experience.yaml`)
@@ -178,28 +178,35 @@ Vertical list of entries, newest first. Each entry has:
   - In light mode, nodes are drawn as small isometric blocks; in dark mode, as glowing circles.
 - `CAME IN TO DO` paragraph.
 - `SHIPPED` list: `→` bullets, dashed dividers, optional `case study →` / `link →`.
-- Stack chips at the bottom.
+- Stack chips at the bottom. On desktop, each project's dates + stack chips sit in a right-hand column; text is capped at ~70ch.
+
+**Chip colours mean a category everywhere** (stack, project tags, skills): purple = AI/ML/GenAI,
+blue = backend/APIs/infra, orange = languages/data/tools. The mapping lives in `src/data/chip-colors.yaml`;
+use `TechChip` for any tech chip.
 
 ### Projects (`projects.yaml`)
-Card grid (2 columns on desktop). Each card has a title, one-liner, a highlight metric ("O(1) per order", "wait-free"), tags, GitHub/demo links, and an optional tiny diagram or image.
+Card grid (2 columns on desktop). Each card has a title, dates, one-liner, a highlight metric ("Spotted a 14% post-festival sales drop"), a short details list, tags, GitHub/demo links, and an optional tiny diagram or image.
 `featured: true` projects get a wide card.
 
 ### Skills (`skills.yaml`)
-Grouped by category (Languages, Backend & Infra, Data, Frontend, Tools).
+Grouped by category (Languages & Backend, GenAI & LLMs, Machine Learning, Databases, Cloud & Tools).
 - Default: groups of sticker-badge chips.
 - Stretch goal: an **isometric "stack"**, one IsoBlock layer per category stacked like a tech stack, that lifts on hover and shows the chips.
 
-### Achievements (`achievements.yaml`)
-Styled like **game "Achievement Unlocked" cards**: icon, title, subtitle, date, rarity color (gold / silver / bronze).
-This is where coding meets gaming. Optionally fetch the live Codeforces rating at build time (with a fallback if the API fails).
+### Achievements (`achievements.yaml` + `certifications.yaml`)
+Styled like **game "Achievement Unlocked" cards**: icon, title, optional subtitle, description, date, rarity color (gold / silver / bronze).
+This is where coding meets gaming.
 
-### Certifications (`certifications.yaml`)
-Compact cards: name, issuer, date, `verify →` link, optional logo. Hidden if the list is empty.
+**Certifications** are their own group inside this section (no separate section or nav link):
+compact cards with name, issuer, date, optional description, `verify →` link, optional logo. The group is hidden if the list is empty;
+the whole section is hidden only when both lists are empty.
 
 ### Interests (`interests.yaml`)
 Bento grid (screenshot 06). Instrument Serif headings, big rounded cards.
-- **Gaming card**: "I love gaming" + a short line + a stack of tilted tiles (my own screenshots/images) + a handwritten "some of my favourites" with an arrow. It can also show my in-game achievements.
-- Other cards: photography carousel, music, anything else. Each card's `layout` (`wide`, `tall`, `square`) comes from YAML.
+- Cards: gaming (wide), trekking (tall), biking (square). Each has a title, a short line, an optional handwritten note,
+  and a small **static ASCII drawing** (`art` rows in YAML, same code-character style as the hero; sketched in `scripts/shapes.mjs`).
+  No photos of me. Each card's `layout` (`wide`, `tall`, `square`) comes from YAML.
+- `images` stays optional in the schema for scenery photos later (stack / carousel via `kind`); not rendered yet.
 
 ### Contact + footer (`profile.yaml → links, email`)
 A terminal-style card:
@@ -217,24 +224,24 @@ Footer: "Built with Astro · last updated {build date}" + a tiny doodle.
 
 `src/data/profile.yaml`
 ```yaml
-name: Varenya
-headline: SDE-II · Backend Engineer
-eyebrow: "SDE-II · ZOMATO · GO / PHP"
-tagline: "TODO: one punchy italic line"
-intro: "TODO: one-sentence intro"
-location: India
-email: TODO
-resume: /resume.pdf
+name: Varenya Visen
+headline: Software Engineer · AI/ML
+eyebrow: "SOFTWARE ENGINEER · KELLTON · PYTHON / GENAI"
+tagline: "I build AI that survives production."
+intro: "Software engineer building GenAI and backend systems in Python: ..."
+location: "TODO: my city"
+email: varenyavisen@gmail.com
+resume: /resume.pdf     # never include a phone number
 about:
-  - "TODO paragraph 1"
-  - "TODO paragraph 2"
+  - "paragraph 1"
+  - "paragraph 2"
+aboutNote: "the short version"
 quickFacts:
-  - { icon: graduation-cap, text: "IIT Dhanbad" }
-  - { icon: zap, text: "Currently into low-latency C++" }
+  - { icon: briefcase, text: "Software Engineer @ Kellton" }
+  - { icon: graduation-cap, text: "B.Tech CSE (AI/ML), Sushant University" }
 links:
-  - { label: GitHub, url: TODO, icon: github }
-  - { label: LinkedIn, url: TODO, icon: linkedin }
-  - { label: Codeforces, url: TODO, icon: code }
+  - { label: GitHub, url: "https://github.com/VarenyaVisen", icon: github }
+  - { label: LinkedIn, url: "https://www.linkedin.com/in/varenya-visen" }   # no icon: shows a text label
 ```
 
 `src/data/experience.yaml`
@@ -268,59 +275,44 @@ The company's date range (top right) is worked out from its roles. Experience ha
 
 `src/data/projects.yaml`
 ```yaml
-- title: O(1) Order Book
-  oneLiner: "Limit order book with O(1) add / cancel / match"
-  highlight: "O(1) per op"
-  tags: [C++, low-latency]
-  repo: TODO
+- title: Customer Churn Analysis
+  start: 2025-03        # optional
+  end: 2025-04          # optional
+  oneLiner: "Finding who churns, and when, across 7,043 telecom customers."
+  highlight: "38% of churners: monthly plan, < 3 months tenure"   # optional
+  details:              # optional bullet list
+    - "Analysed churn patterns by tenure, contract type and monthly charges"
+  tags: [Python, Pandas, EDA, Data Viz]
+  repo: TODO            # optional
   featured: true
-- title: Lock-free Seqlock
-  oneLiner: "TODO"
-  highlight: "lock-free"
-  tags: [C++, concurrency]
-  repo: TODO
-- title: Wait-free SPSC Queue
-  oneLiner: "TODO"
-  highlight: "wait-free"
-  tags: [C++, concurrency]
-  repo: TODO
 ```
 
 `src/data/achievements.yaml`
 ```yaml
-- title: Candidate Master
-  subtitle: Codeforces
+- title: Best Final Year Project
+  description: "Power BI dashboard on academic performance across 6 departments"   # optional
   rarity: gold          # gold | silver | bronze
-  icon: trophy
-  date: TODO
-  link: TODO
-- title: ICPC Regionalist
-  subtitle: ICPC
-  rarity: silver
-  icon: medal
-- title: Meta Hacker Cup, Round 2
-  subtitle: Meta
-  rarity: silver
-  icon: flag
+  icon: award
+  date: "2025"
+  # subtitle, link: optional
 ```
 
 `src/data/skills.yaml`
 ```yaml
-- category: Languages
-  items: [Go, PHP, C++, Python, TypeScript, SQL]
-- category: Backend & Infra
-  items: [TODO]
-- category: Frontend
-  items: [React]
+- category: Languages & Backend
+  items: [Python, SQL, FastAPI, REST APIs, Celery, Pytest]
+- category: Databases
+  items: [MongoDB, PostgreSQL, Chroma]
 ```
 
 `src/data/certifications.yaml`
 ```yaml
-[]   # empty list → section hidden. Example entry:
-# - name: TODO
-#   issuer: TODO
-#   date: 2026-01
-#   url: TODO
+# empty list ([]) → section hidden
+- name: Google Data Analytics Certificate
+  issuer: Coursera
+  date: "2024"
+  description: "8 case studies on SQL, data cleaning and dashboards"   # optional
+  url: TODO             # optional "verify →" link
 ```
 
 `src/data/interests.yaml`

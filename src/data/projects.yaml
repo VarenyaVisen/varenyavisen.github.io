@@ -1,19 +1,28 @@
-# Project cards. featured: true makes a wide card. repo/demo are optional links.
-- title: O(1) Order Book
-  oneLiner: "Limit order book with O(1) add / cancel / match"
-  highlight: "O(1) per op"
-  tags: [C++, low-latency]
-  repo: TODO
+# Project cards, newest first. featured: true makes a wide card. repo/demo are optional links.
+# Dates are YYYY-MM. details = short bullet list.
+- title: Customer Churn Analysis
+  start: 2025-03
+  end: 2025-04
+  oneLiner: "Finding who churns, and when, across 7,043 telecom customers."
+  highlight: "38% of churners: monthly plan, < 3 months tenure"
+  details:
+    - "Analysed churn patterns by tenure, contract type and monthly charges"
+    - "Engineered contract-type buckets and tenure bands for sharper segmentation"
+    - "11 visualisations (histograms, box plots, heatmaps) of churn-prone segments"
+    - "Suggested early-engagement strategies for new monthly-plan users"
+  tags: [Python, Pandas, EDA, Data Viz]
+  repo: "TODO: GitHub link"
   featured: true
 
-- title: Lock-free Seqlock
-  oneLiner: "TODO"
-  highlight: "lock-free"
-  tags: [C++, concurrency]
-  repo: TODO
-
-- title: Wait-free SPSC Queue
-  oneLiner: "TODO"
-  highlight: "wait-free"
-  tags: [C++, concurrency]
-  repo: TODO
+- title: Sales Dashboard for Regional Performance
+  start: 2025-02
+  end: 2025-03
+  oneLiner: "A drill-down Power BI dashboard over 25,000+ sales rows across 5 regions."
+  highlight: "Spotted a 14% post-festival sales drop"
+  details:
+    - "Joined 3 sales tables (12 months, 5 regions) with optimised SQL"
+    - "10 dynamic measures and KPIs for regional sales, returns and products"
+    - "Multipage dashboards with slicers to drill down by region, category and time"
+    - "The South-region insight fed into a marketing recovery plan"
+  tags: [SQL, Power BI, Dashboards]
+  repo: "TODO: link (or remove this line)"

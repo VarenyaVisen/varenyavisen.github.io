@@ -1,0 +1,20 @@
+---
+// Stack / skill chip whose colour shows its category: purple = AI/ML/GenAI, blue = backend/APIs/infra,
+// orange = languages/data/tools, plain = not listed. Reads chip-colors.yaml (edit the mapping there).
+import { getEntry } from 'astro:content';
+import Badge from './Badge.astro';
+
+interface Props {
+  name: string;
+  tilt?: number;
+}
+const { name, tilt = 0 } = Astro.props;
+
+const groups = (await getEntry('chipColors', 'chip-colors'))?.data;
+const color =
+  (['purple', 'blue', 'orange'] as const).find((c) =>
+    groups?.[c].some((t) => t.toLowerCase() === name.toLowerCase()),
+  ) ?? 'plain';
+---
+
+<Badge color={color} tilt={tilt}>{name}</Badge>

@@ -1,6 +1,6 @@
-# Certifications. Empty list → section hidden. Example entry:
-# - name: TODO
-#   issuer: TODO
-#   date: 2026-01
-#   url: TODO          # optional "verify →" link
-[]
+# Certifications. Empty list ([]) → section hidden. url = optional "verify →" link.
+- name: Google Data Analytics Certificate
+  issuer: Coursera
+  date: "2024"
+  description: "8 case studies on SQL, data cleaning and dashboards"
+  url: "TODO: credential link"
