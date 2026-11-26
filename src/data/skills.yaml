@@ -1,9 +1,15 @@
 # Skill groups, shown as chips. Each group needs at least one item.
-- category: Languages
-  items: [Go, PHP, C++, Python, TypeScript, SQL]
+- category: Languages & Backend
+  items: [Python, SQL, FastAPI, REST APIs, Celery, Pytest]
 
-- category: Backend & Infra
-  items: [TODO]
+- category: GenAI & LLMs
+  items: ["RAG (Hybrid Search, Reranking, Evaluation)", LangChain, LangGraph, AI Agents, Tool Calling, Azure OpenAI]
 
-- category: Frontend
-  items: [React]
+- category: Machine Learning
+  items: [Scikit-learn, PyTorch, TensorFlow, Hugging Face, Feature Engineering, Pandas, NumPy]
+
+- category: Databases
+  items: [MongoDB, PostgreSQL, Chroma (Vector Store)]
+
+- category: Deployment & Monitoring
+  items: [Microsoft Azure, Git, GitHub, CI/CD Pipelines, Log-Based Debugging]

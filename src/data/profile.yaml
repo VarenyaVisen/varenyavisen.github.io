@@ -1,14 +1,14 @@
 # Who you are. Used by the Hero, About and Contact sections.
 name: Varenya
-headline: SDE-II · Backend Engineer
-eyebrow: "SDE-II · ZOMATO · GO / PHP"
+headline: Software Engineer · AI/ML
+eyebrow: "SOFTWARE ENGINEER · KELLTON · PYTHON / GENAI"
 tagline: "TODO: one punchy italic line"
-intro: "TODO: one-sentence intro"
+intro: "Software engineer at Kellton Tech Solutions, building RAG pipelines, LLM-assisted verification and ML models behind FastAPI services."
 # Hero buttons: the first scrolls to Experience, the second to Contact.
 workButton: "See my work ↓"
 contactButton: "Get in touch →"
 location: India
-email: TODO
+email: varenyavisen@gmail.com
 resume: /resume.pdf
 
 # About section paragraphs. Empty list ([]) hides the About section.
@@ -18,15 +18,15 @@ about:
 
 # Sticky-note cards next to About. icon = a Lucide icon name (lucide.dev/icons).
 quickFacts:
-  - { icon: graduation-cap, text: "IIT Dhanbad" }
+  - { icon: graduation-cap, text: "B.Tech CSE (AI/ML), Sushant University, 2025" }
   - { icon: map-pin, text: "India" }
-  - { icon: zap, text: "Currently into low-latency C++" }
+  - { icon: briefcase, text: "Software Engineer @ Kellton Tech Solutions" }
 
 # Social links. icon = a Simple Icons slug (simpleicons.org), optional.
 # LinkedIn has no icon: Simple Icons removed its logo, so it shows as a text label.
 links:
-  - { label: GitHub, url: TODO, icon: github }
-  - { label: LinkedIn, url: TODO }
-  - { label: Codeforces, url: TODO, icon: codeforces }
+  - { label: GitHub, url: "https://github.com/VarenyaVisen", icon: github }
+  - { label: LinkedIn, url: "https://linkedin.com/in/varenya-visen" }
+  # - { label: Codeforces, url: TODO, icon: codeforces }
   # - { label: LeetCode, url: TODO, icon: leetcode }
   # - { label: X, url: TODO, icon: x }

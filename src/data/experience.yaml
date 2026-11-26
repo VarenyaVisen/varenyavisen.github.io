@@ -1,29 +1,96 @@
-# Jobs, newest first. To add one: copy the whole top entry, paste it above, edit.
-- company: Zomato (Eternal)
-  companyUrl: https://www.zomato.com
-  role: SDE-II, Backend
+# Jobs/projects, newest first. To add one: copy the whole top entry, paste it above, edit.
+# Each Kellton project is its own entry so it gets its own dates and diagram.
+- company: Kellton Tech Solutions
+  role: AI-Assisted Loan Docket Verification Engine
   type: Full-time
   location: TODO
-  start: TODO          # e.g. 2023-07
-  end: present
+  start: 2026-10
+  end: 2026-11
   cameInToDo: >
-    TODO: what you were hired to own: customer support automation,
-    order management systems, proactive support infrastructure.
-  diagram:             # optional, delete this whole block to hide it
-    type: pipeline     # pipeline | trace
-    title: "PROACTIVE SUPPORT, END-TO-END"
+    Verify home-loan dockets against OCR data across 150+ checks and a
+    47-item checklist, and produce FTR/FTNR decisions.
+  diagram:
+    type: pipeline
+    title: "DOCKET VERIFICATION, END-TO-END"
     nodes:
-      - { above: ingest, label: "order events", below: "TODO metric" }
-      - { above: detect, label: "issue rules",  below: "TODO" }
-      - { above: act,    label: "auto-resolve", below: "TODO" }
-      - { above: notify, label: "customer",     below: "TODO" }
-    # A trace diagram looks like this instead (steps run one after another):
-    # type: trace
-    # title: "TODO"
-    # steps:
-    #   - { label: query, ms: 12 }
-    #   - { label: retrieve, ms: 40 }
+      - { above: input,    label: "OCR + docket",  below: "Data Fetch API" }
+      - { above: match,    label: "RapidFuzz",     below: "clear cases" }
+      - { above: escalate, label: "LLM check",     below: "low-score pairs" }
+      - { above: decide,   label: "FTR / FTNR",    below: "150+ checks" }
   shipped:
-    - text: "TODO: thing you shipped · how · impact"
-      link: null       # or a URL to show "case study →"
-  stack: [Go, PHP, SQL]
+    - text: "FastAPI engine that verifies home-loan dockets against OCR data across 150+ checks and a 47-item checklist"
+    - text: "Hybrid fuzzy + LLM matching: RapidFuzz handles clear cases, low-score pairs escalate to an LLM via a confidence threshold, reducing false failures"
+    - text: "Integrated the client's Data Fetch API through a mapping layer; fixed a mapping bug that failed every salaried applicant and documented API data gaps"
+    - text: "Maintained 700+ pytest tests and supported UAT by debugging Celery, MongoDB and API errors from logs"
+  stack: [Python, FastAPI, RapidFuzz, Azure OpenAI, Celery, MongoDB, Pytest]
+
+- company: Kellton Tech Solutions
+  role: AI-Powered Observability Platform
+  type: Full-time
+  location: TODO
+  start: 2026-06
+  end: 2026-08
+  cameInToDo: >
+    Turn unstructured application logs into a RAG chatbot that finds
+    the relevant logs and generates root causes.
+  diagram:
+    type: pipeline
+    title: "LOGS TO ROOT CAUSE"
+    nodes:
+      - { above: ingest,   label: "raw logs",      below: "preprocessed" }
+      - { above: retrieve, label: "hybrid search", below: "cosine ≥ 0.5" }
+      - { above: rerank,   label: "cross-encoder", below: "MiniLM-L-6-v2" }
+      - { above: answer,   label: "root cause",    below: "95% grounded" }
+  shipped:
+    - text: "Preprocessing pipeline that standardizes unstructured application logs for analysis"
+    - text: "Relevance-based log retrieval with Chroma embeddings and hybrid search (0.5 cosine similarity threshold)"
+    - text: "Reranking with cross-encoder/ms-marco-MiniLM-L-6-v2 before root cause generation"
+    - text: "RAG Triad evaluation: 92% context relevance, 95% groundedness, 92% answer relevance"
+  stack: [Python, Chroma, LangChain, Hugging Face, Azure OpenAI]
+
+- company: Kellton Tech Solutions
+  role: ML-Based Utility Cost Estimation
+  type: Full-time
+  location: TODO
+  start: 2026-05
+  end: 2026-06
+  cameInToDo: >
+    Predict utility project costs, split into material, internal labor,
+    external labor and other.
+  diagram:
+    type: pipeline
+    title: "COST PREDICTION"
+    nodes:
+      - { above: explore, label: "EDA",          below: "cost drivers" }
+      - { above: shape,   label: "features",     below: "encoded" }
+      - { above: tune,    label: "Optuna",       below: "hyperparams" }
+      - { above: predict, label: "XGBoost",      below: "R² 0.75–0.78" }
+  shipped:
+    - text: "Identified key cost drivers through EDA to align input features with the prediction goal"
+    - text: "Feature engineering, categorical encoding and XGBoost tuning with Optuna"
+    - text: "Multivariate XGBoost model predicting four cost components at once (R² 0.75 material, 0.77 internal labor, 0.78 external labor, 0.78 other)"
+  stack: [Python, XGBoost, Optuna, Scikit-learn, Pandas, NumPy]
+
+- company: Kellton Tech Solutions
+  role: Survey Intelligence Platform
+  type: Full-time
+  location: TODO
+  start: 2025-11
+  end: 2026-03
+  cameInToDo: >
+    Build analytics for survey responses: click heatmaps and video
+    audience reactions, served over REST APIs.
+  diagram:
+    type: pipeline
+    title: "SURVEY ANALYTICS"
+    nodes:
+      - { above: fetch,  label: "MongoDB",        below: "Beanie ODM" }
+      - { above: render, label: "OpenCV heatmap", below: "click intensity" }
+      - { above: store,  label: "Azure Blob",     below: "images" }
+      - { above: serve,  label: "FastAPI",        below: "REST APIs" }
+  shipped:
+    - text: "Integrated MongoDB with Beanie ODM for survey response retrieval and processing"
+    - text: "OpenCV heatmap images of survey click intensity, stored in Azure Blob Storage"
+    - text: "Video pulse: aggregated ratings at user reaction timestamps into line graphs"
+    - text: "Exposed heatmap and video pulse analytics through FastAPI REST APIs"
+  stack: [Python, FastAPI, MongoDB, Beanie, OpenCV, Azure Blob Storage]
