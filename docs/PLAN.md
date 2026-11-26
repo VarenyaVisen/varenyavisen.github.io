@@ -239,29 +239,32 @@ links:
 
 `src/data/experience.yaml`
 ```yaml
-- company: Zomato (Eternal)
-  companyUrl: https://www.zomato.com
-  role: SDE-II, Backend
-  type: Full-time
+# One entry per company, newest first. Dates are YYYY-MM; an end date can also be "present".
+- company: Kellton Tech Solutions
+  companyUrl: https://...   # optional: links the company name
   location: TODO
-  start: TODO          # e.g. 2023-07
-  end: present
-  cameInToDo: >
-    TODO: what you were hired to own: customer support automation,
-    order management systems, proactive support infrastructure.
-  diagram:             # optional, delete this whole block to hide it
-    type: pipeline     # pipeline | trace
-    title: "PROACTIVE SUPPORT, END-TO-END"
-    nodes:
-      - { above: ingest,   label: "order events", below: "TODO metric" }
-      - { above: detect,   label: "issue rules",  below: "TODO" }
-      - { above: act,      label: "auto-resolve", below: "TODO" }
-      - { above: notify,   label: "customer",     below: "TODO" }
-  shipped:
-    - text: "TODO: thing you shipped · how · impact"
-      link: null
-  stack: [Go, PHP, SQL]
+  summary: "TODO: one line on what you owned here"   # optional
+  roles:                    # newest first; add one above for a promotion
+    - title: Software Engineer
+      type: Full-time
+      start: 2025-09
+      end: present
+  projects:                 # projects built at this company, newest first
+    - name: AI-Powered Observability Platform
+      start: 2026-06        # optional
+      end: 2026-08          # optional
+      description: >
+        Turn unstructured application logs into a RAG chatbot that finds
+        the relevant logs and generates root causes.
+      did:                  # 2–4 bullets
+        - "Preprocessing pipeline that standardizes unstructured application logs for analysis"
+        - "Reranking with cross-encoder/ms-marco-MiniLM-L-6-v2 before root cause generation"
+      impact: "RAG Triad evaluation: 92% context relevance, 95% groundedness, 92% answer relevance"   # optional
+      stack: [Python, Chroma, LangChain]
+      link: https://...     # optional, shows "link →"
 ```
+The company's date range (top right) is worked out from its roles. Experience has no diagrams;
+`PipelineDiagram` / `TraceDiagram` stay in `src/components/diagrams/` (shown on /styleguide) for use elsewhere.
 
 `src/data/projects.yaml`
 ```yaml

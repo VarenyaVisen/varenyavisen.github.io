@@ -6,6 +6,7 @@ import type { Loader } from 'astro/loaders';
 import { z } from 'astro/zod';
 import { existsSync, readdirSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as simpleIcons from 'simple-icons';
 import { parse } from 'yaml';
@@ -18,22 +19,35 @@ function yamlFile(name: string): Loader {
     name: 'yaml-file',
     load: async ({ store, parseData, watcher, logger, config }) => {
       const filePath = fileURLToPath(new URL(`src/data/${name}.yaml`, config.root));
+      // Parse and validate the whole file BEFORE touching the store, so a bad edit never empties a section.
       const sync = async () => {
-        store.clear();
-        if (!existsSync(filePath)) return;
-        const data = parse(await readFile(filePath, 'utf-8')) ?? [];
-        const items: [string, Record<string, unknown>][] = Array.isArray(data)
-          ? data.map((item, i) => [String(i), item])
-          : [[name, data]];
-        for (const [id, item] of items) {
-          store.set({ id, data: await parseData({ id, data: item, filePath }), filePath });
+        const entries = [];
+        if (existsSync(filePath)) {
+          const data = parse(await readFile(filePath, 'utf-8')) ?? [];
+          const items: [string, Record<string, unknown>][] = Array.isArray(data)
+            ? data.map((item, i) => [String(i), item])
+            : [[name, data]];
+          for (const [id, item] of items) {
+            entries.push({ id, data: await parseData({ id, data: item, filePath }), filePath });
+          }
         }
+        store.clear();
+        for (const entry of entries) store.set(entry);
       };
-      await sync();
+      // Watch before the first load, so fixing a broken file recovers without restarting the dev server.
       watcher?.add(filePath);
       watcher?.on('change', (changed) => {
-        if (changed === filePath) sync().catch((e) => logger.error(String(e)));
+        if (resolve(changed) !== resolve(filePath)) return; // resolve(): Windows paths come in either slash style
+        sync()
+          .then(() => logger.info(`src/data/${name}.yaml reloaded`))
+          .catch((e) =>
+            logger.error(
+              `\n\n  src/data/${name}.yaml has an error. The page keeps showing the last good version until you fix it.\n\n` +
+                `  ${e instanceof Error ? e.message : String(e)}\n`,
+            ),
+          );
       });
+      await sync(); // first load: an error stops the build / dev start
     },
   };
 }
